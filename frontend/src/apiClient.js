@@ -5,6 +5,38 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
+});
+// CSRF token cache
+let csrfToken = null;
+
+async function ensureCsrfToken() {
+    if (csrfToken) return csrfToken;
+    try {
+        const res = await fetch((process.env.REACT_APP_API_BASE_URL || '') + '/csrf-token', {
+            method: 'GET',
+            credentials: 'include',
+        });
+        const json = await res.json().catch(() => ({}));
+        csrfToken = json?.data?.csrfToken || null;
+        return csrfToken;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Attach CSRF token for unsafe methods
+api.interceptors.request.use(async (config) => {
+    const method = (config.method || 'get').toLowerCase();
+    if (['post', 'put', 'patch', 'delete'].includes(method)) {
+        const token = await ensureCsrfToken();
+        if (token) {
+            config.headers = config.headers || {};
+            config.headers['X-CSRF-Token'] = token;
+        }
+    }
+    config.withCredentials = true;
+    return config;
 });
 
 function normalizeSuccessResponse(response) {
@@ -38,7 +70,13 @@ axios.interceptors.response.use(normalizeSuccessResponse, normalizeError);
 
 export async function safeFetch(input, init = {}) {
     try {
-        const response = await fetch(input, init);
+        const method = (init?.method || 'GET').toUpperCase();
+        let headers = init?.headers || {};
+        if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+            const token = await ensureCsrfToken();
+            if (token) headers = { ...headers, 'X-CSRF-Token': token };
+        }
+        const response = await fetch(input, { ...init, headers, credentials: 'include' });
         if (!response.ok) {
             const data = await response.json().catch(() => ({}));
             const message = data?.error?.message || data?.message || 'Request failed';

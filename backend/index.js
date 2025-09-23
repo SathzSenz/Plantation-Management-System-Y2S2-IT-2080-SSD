@@ -3,6 +3,8 @@ import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { TestRecord } from "./models/TestModel.js";
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import csurf from 'csurf';
 import testRoute from "./routes/TestRoute.js";
 
 import BookingRoute from "./routes/AgroTourism Routes/BookingRoute.js";
@@ -42,6 +44,7 @@ import MachineRecordRoute from "./routes/Finance Routes/MachineRecordRoute.js";
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
  
 //app.use(cors());
 
@@ -51,7 +54,8 @@ app.use(express.json());
 app.use(cors({
     origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000', 'https://elemahana.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
+    credentials: true,
 }));
 
 // response helpers and request id
@@ -59,6 +63,29 @@ import { attachResponseHelpers } from './middleware/responseMiddleware.js';
 import { requestIdMiddleware, notFoundMiddleware, errorHandler } from './middleware/errorMiddleware.js';
 app.use(requestIdMiddleware);
 app.use(attachResponseHelpers);
+
+// CSRF protection (cookie-based secret)
+const csrfProtection = csurf({
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    },
+});
+
+// Mount CSRF after CORS/cookies but before routes
+app.use(csrfProtection);
+
+// CSRF token endpoint for SPA to fetch token
+app.get('/csrf-token', (req, res) => {
+    // Optionally also mirror token in a readable cookie for non-AJAX forms
+    res.cookie('XSRF-TOKEN', req.csrfToken(), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
+    return res.status(200).json({ success: true, data: { csrfToken: req.csrfToken() }, requestId: req.requestId });
+});
 
 app.get('/', (request, response) => {
     console.log(request);
