@@ -46,7 +46,7 @@ export default function FinanceTransactionsStatBar() {
         const lastWeek = getWeekStartEnd(new Date(today.setDate(today.getDate() - 7)), 1);
 
         setLoading(true);
-        axios.get('https://elemahana-backend.vercel.app/transactions')
+        axios.get('http://localhost:5555/transactions')
             .then((response) => {
                 const records = response.data.data;
 

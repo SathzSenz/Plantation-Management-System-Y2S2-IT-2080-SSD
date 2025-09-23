@@ -25,7 +25,7 @@ const EditCropInput = () => {
         setLoading(true);
         const fetchData = async () => {
             try {
-                const response = await axios.get(`https://elemahana-backend.vercel.app/cropinput/${id}`);
+                const response = await axios.get(`http://localhost:5555/cropinput/${id}`);
                 console.log("API Response: ", response.data);
 
                 const formattedDate = new Date(response.data.date).toISOString().split('T')[0];
@@ -52,7 +52,7 @@ const EditCropInput = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/inventoryinputs`)
+            .get(`http://localhost:5555/inventoryinputs`)
             .then((response) => {
                 const inventoryInputsData = response.data.data;
                 const cropTypesWithQuantity = inventoryInputsData
@@ -118,7 +118,7 @@ const EditCropInput = () => {
 
         setLoading(true);
         try {
-            await axios.put(`https://elemahana-backend.vercel.app/cropinput/${id}`, formData);
+            await axios.put(`http://localhost:5555/cropinput/${id}`, formData);
             setLoading(false);
             enqueueSnackbar('Record Updated successfully', { variant: 'success' });
             if (formData.type === 'Planting') {

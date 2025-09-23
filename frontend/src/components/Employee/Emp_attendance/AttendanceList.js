@@ -17,7 +17,7 @@ const AttendanceList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/attendanceRecords`)
+            .get(`http://localhost:5555/attendanceRecords`)
             .then((response) => {
                 setAttendanceRecords(response.data.data);
                 setLoading(false);
@@ -33,7 +33,7 @@ const AttendanceList = () => {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/attendanceRecords/${recordId}`)
+                .delete(`http://localhost:5555/attendanceRecords/${recordId}`)
                 .then(() => {
                     setAttendanceRecords(prevRecords => prevRecords.filter(record => record._id !== recordId));
                     setLoading(false);

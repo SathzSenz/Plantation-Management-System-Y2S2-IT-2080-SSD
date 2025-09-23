@@ -50,7 +50,7 @@ const Payment = () => {
             setTimeout(() => {
                 // Post order data
                 axios
-                    .post('https://elemahana-backend.vercel.app/orderRecords', orderData)
+                    .post('http://localhost:5555/orderRecords', orderData)
                     .then(() => {
                         enqueueSnackbar('Record Created Successfully', { variant: 'success' });
                         // Navigate to the confirmation page

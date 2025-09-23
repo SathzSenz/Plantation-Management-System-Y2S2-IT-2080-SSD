@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../../apiClient';
 
 function Weather() {
     const [weatherData, setWeatherData] = useState({ temperature: null, weatherCode: null });
@@ -7,7 +7,7 @@ function Weather() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data } = await axios.get('https://elemahana-backend.vercel.app/weather?lat=40.7128&lon=-74.0060');
+                const { data } = await api.get('http://localhost:5555/weather?lat=40.7128&lon=-74.0060');
                 console.log(data); // To understand the structure
 
                 // Assuming data contains an array named 'timelines' and we are interested in the first item

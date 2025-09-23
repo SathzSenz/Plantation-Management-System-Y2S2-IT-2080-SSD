@@ -15,7 +15,7 @@ const ConfirmTheOrders = () =>{
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/orderRecords')
+            .get('http://localhost:5555/orderRecords')
             .then((response) =>{
                 setOrderRecords(response.data.data); // Assuming response.data is an object with a 'data' property containing an array of records
                 setLoading(false);
@@ -28,7 +28,7 @@ const ConfirmTheOrders = () =>{
 
     const confirmOrder = async (record) => {
         try {
-            const response = await axios.put(`https://elemahana-backend.vercel.app/orderRecords/${record._id}`, {
+            const response = await axios.put(`http://localhost:5555/orderRecords/${record._id}`, {
                 orderStatus: 'confirmed',
                 orderQuantity: record.orderQuantity // include all required fields
             });

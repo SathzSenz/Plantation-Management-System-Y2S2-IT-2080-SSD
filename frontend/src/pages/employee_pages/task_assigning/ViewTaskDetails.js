@@ -27,7 +27,7 @@ export default function ViewTaskDetails() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/taskRecords/${id}`)
+            .get(`http://localhost:5555/taskRecords/${id}`)
             .then((response) => {
                 setTaskRecord(response.data);
                 setLoading(false);

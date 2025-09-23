@@ -1,13 +1,14 @@
 import express from "express";
 import {RegistrationRecord} from "../../models/EmpManagement/RegistrationModel.js";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 
 
 const router = express.Router();
 
 //Route for save a new employee
-router.post('/', async(request, response) => {
-    try {
+router.post('/', asyncHandler(async(request, response) => {
         if (
             !request.body.f_name ||
             !request.body.l_name||
@@ -23,9 +24,7 @@ router.post('/', async(request, response) => {
             !request.body.h_rate
 
         ) {
-            return response.status(400).send ({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const NewRegistration = {
@@ -46,50 +45,30 @@ router.post('/', async(request, response) => {
         };
 
         const RegistrationsRecords = await RegistrationRecord.create(NewRegistration)
-        return response.status(201).send(RegistrationsRecords);
-
-    } catch(error) {
-
-        console.log(error.message);
-        response.status(500).send({message:error.message});
-    }
-});
+        return response.success(RegistrationsRecords, 201);
+}));
 
 //Route to get all the register employees from the database
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const RegistrationsRecords = await RegistrationRecord.find({});
-
-        return response.status(200).json({
+        return response.success({
             count: RegistrationsRecords.length,
             data: RegistrationsRecords,
         });
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+}));
 
 //Route for get one register employee from database by id
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const RegistrationsRecords = await RegistrationRecord.findById(id);
-
-        return response.status(200).json(RegistrationsRecords);
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        if (!RegistrationsRecords) throw createNotFoundError('Registration record');
+        return response.success(RegistrationsRecords);
+}));
 
 //Route for update employee
 
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         if (
 
             !request.body.f_name ||
@@ -106,46 +85,31 @@ router.put('/:id', async (request, response) => {
             !request.body.h_rate
 
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const { id } = request.params;
 
-        const result = await RegistrationRecord.findByIdAndUpdate(id, request.body);
+        const result = await RegistrationRecord.findByIdAndUpdate(id, request.body, { new: true });
 
         if (!result) {
-            return response.status(404).json({ message: 'Registration record not found' });
+            throw createNotFoundError('Registration record');
         }
-
-        return response.status(200).send({ message: 'Registration record updated successfully' });
-
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Registration record updated successfully', data: result });
+}));
 
 //Route to delete a registration record
 
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const result = await RegistrationRecord.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).json({ message: 'Registration record not found' });
+            throw createNotFoundError('Registration record');
         }
-
-        return response.status(200).send({ message: 'Registration record deleted successfully' });
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Registration record deleted successfully' });
+}));
 
 export default router;
 

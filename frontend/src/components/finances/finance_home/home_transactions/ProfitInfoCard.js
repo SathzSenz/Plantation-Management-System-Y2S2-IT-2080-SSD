@@ -11,7 +11,7 @@ export default function ProfitGraph() {
     const svgRef = useRef();
 
     useEffect(() => {
-        axios.get("https://elemahana-backend.vercel.app/transactions")
+        axios.get("http://localhost:5555/transactions")
             .then((response) => {
                 const records = response.data.data;
                 // Calculate profit for each period

@@ -1,22 +1,21 @@
 import express from "express";
 import {AttendanceRecord} from "../../models/EmpManagement/AttendanceModel.js";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 
 
 const router = express.Router();
 
 //Route for save a new attendance
-router.post('/', async(request, response) => {
-    try {
+router.post('/', asyncHandler(async(request, response) => {
         if (
             !request.body.e_name ||
             !request.body.e_date||
             !request.body.att_status
 
         ) {
-            return response.status(400).send ({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const NewAttendance = {
@@ -28,50 +27,29 @@ router.post('/', async(request, response) => {
         };
 
         const AttendanceRecords = await AttendanceRecord.create(NewAttendance)
-        return response.status(201).send(AttendanceRecords);
-
-    } catch(error) {
-
-        console.log(error.message);
-        response.status(500).send({message:error.message});
-    }
-});
+        return response.success(AttendanceRecords, 201);
+}));
 
 //Route to get all the attendance from the database
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const AttendanceRecords = await AttendanceRecord.find({});
-
-        return response.status(200).json({
+        return response.success({
             count: AttendanceRecords.length,
             data: AttendanceRecords,
         });
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+}));
 
 //Route for get one attendance from database by id
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
-
         const AttendanceRecords = await AttendanceRecord.findById(id);
-
-        return response.status(200).json(AttendanceRecords);
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        if (!AttendanceRecords) throw createNotFoundError('Attendance record');
+        return response.success(AttendanceRecords);
+}));
 
 //Route for update attendance
 
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         if (
 
             !request.body.e_name ||
@@ -79,45 +57,30 @@ router.put('/:id', async (request, response) => {
             !request.body.att_status
 
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const { id } = request.params;
 
-        const result = await AttendanceRecord.findByIdAndUpdate(id, request.body);
+        const result = await AttendanceRecord.findByIdAndUpdate(id, request.body, { new: true });
 
         if (!result) {
-            return response.status(404).json({ message: 'Attendance record not found' });
+            throw createNotFoundError('Attendance record');
         }
-
-        return response.status(200).send({ message: 'Attendance record updated successfully' });
-
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Attendance record updated successfully', data: result });
+}));
 
 //Route to delete an attendance record
 
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const result = await AttendanceRecord.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).json({ message: 'Attendance record not found' });
+            throw createNotFoundError('Attendance record');
         }
-
-        return response.status(200).send({ message: 'Attendance record deleted successfully' });
-    } catch (error) {
-
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Attendance record deleted successfully' });
+}));
 
 export default router;

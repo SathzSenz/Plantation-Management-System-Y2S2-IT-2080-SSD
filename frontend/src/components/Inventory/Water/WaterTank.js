@@ -44,7 +44,7 @@ function WaterTank() {
             water_des
         };
         axios
-            .post('https://elemahana-backend.vercel.app/waterRecords', data)
+            .post('http://localhost:5555/waterRecords', data)
             .then((response) => {
                 enqueueSnackbar('Record Created successfully', { variant: 'success' });
                 setWaterRecord(prevRecords => [...prevRecords, response.data]);
@@ -93,7 +93,7 @@ function WaterTank() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/waterRecords`)
+            .get(`http://localhost:5555/waterRecords`)
             .then((response) => {
                 setWaterRecord(response.data.data);
                 setLoading(false);
@@ -109,7 +109,7 @@ function WaterTank() {
 
     const handleDelete = (recordId) => {
         axios
-            .delete(`https://elemahana-backend.vercel.app/waterRecords/${recordId}`)
+            .delete(`http://localhost:5555/waterRecords/${recordId}`)
             .then(() => {
                 setWaterRecord(prevRecords => prevRecords.filter(record => record._id !== recordId));
                 enqueueSnackbar('Record Deleted Successfully!', {

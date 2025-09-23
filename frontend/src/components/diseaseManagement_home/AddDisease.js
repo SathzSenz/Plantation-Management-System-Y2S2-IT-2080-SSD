@@ -93,7 +93,7 @@ export default function AddDisease() {
 
         setLoading(true);
                     axios
-                        .post(`https://elemahana-backend.vercel.app/diseases`, data)
+                        .post(`http://localhost:5555/diseases`, data)
                         .then(() => {
                             setLoading(false);
                             navigate('/diseases/records');

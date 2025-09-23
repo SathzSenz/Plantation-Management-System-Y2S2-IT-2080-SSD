@@ -30,7 +30,7 @@ export default function AgrochemicalTile() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`https://elemahana-backend.vercel.app/cropinput`);
+                const response = await axios.get(`http://localhost:5555/cropinput`);
                 if (response.status === 200 && response.data && response.data.data) {
                     const plantingRecordsData = response.data.data.filter(record => record.type === 'Planting');
                     setPlantingRecords(plantingRecordsData);

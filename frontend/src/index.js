@@ -5,6 +5,9 @@ import './index.css';
 
 import App from "./App";
 import {SnackbarProvider} from "notistack";
+import { api } from './apiClient';
+
+// Attach global interceptors once by importing apiClient here
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

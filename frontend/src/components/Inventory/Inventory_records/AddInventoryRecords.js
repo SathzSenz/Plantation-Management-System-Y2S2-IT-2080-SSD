@@ -48,7 +48,7 @@ export default function AddInventoryRecords() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("https://elemahana-backend.vercel.app/inventoryinputs", formData);
+            await axios.post("http://localhost:5555/inventoryinputs", formData);
 
             enqueueSnackbar('Record Created Successfully!', {
                 variant: 'success',
@@ -87,7 +87,7 @@ export default function AddInventoryRecords() {
                     method: 'Automated Entry',
                 };
 
-                await axios.post('https://elemahana-backend.vercel.app/transactions', transactionData);
+                await axios.post('http://localhost:5555/transactions', transactionData);
             }
 
         } catch (error) {

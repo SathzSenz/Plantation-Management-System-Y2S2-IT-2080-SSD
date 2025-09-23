@@ -27,7 +27,7 @@ export default function ViewOneEmpDetails() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/employeeRecords/${id}`)
+            .get(`http://localhost:5555/employeeRecords/${id}`)
             .then((response) => {
                 setRegistrationRecord(response.data);
                 setLoading(false);

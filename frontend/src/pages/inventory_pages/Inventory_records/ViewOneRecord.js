@@ -24,7 +24,7 @@ export default function ViewOneRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/inventoryinputs/${id}`)
+            .get(`http://localhost:5555/inventoryinputs/${id}`)
             .then((response) => {
                 setRecord(response.data);
                 setLoading(false);

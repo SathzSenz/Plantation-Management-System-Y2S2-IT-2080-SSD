@@ -29,7 +29,7 @@ const EditInventoryRecords = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://elemahana-backend.vercel.app/inventoryinputs/${id}`)
+        axios.get(`http://localhost:5555/inventoryinputs/${id}`)
             .then((response) => {
                 const data = response.data;
                 setFormData({
@@ -100,7 +100,7 @@ const EditInventoryRecords = () => {
         };
 
         try {
-            await axios.put(`https://elemahana-backend.vercel.app/inventoryinputs/${id}`, updatedData);
+            await axios.put(`http://localhost:5555/inventoryinputs/${id}`, updatedData);
             setLoading(false);
             enqueueSnackbar('Record Edited Successfully!', {
                 variant: 'success',
@@ -123,7 +123,7 @@ const EditInventoryRecords = () => {
                     method: 'Automated Entry',
                 };
 
-                await axios.post('https://elemahana-backend.vercel.app/transactions', transactionData);
+                await axios.post('http://localhost:5555/transactions', transactionData);
             }
         } catch (error) {
             setLoading(false);

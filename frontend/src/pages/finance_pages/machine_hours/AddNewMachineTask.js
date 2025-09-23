@@ -51,7 +51,7 @@ function AddNewMachineTask() {
         };
         setLoading(true);
         axios
-            .post('https://elemahana-backend.vercel.app/machines', machineData)
+            .post('http://localhost:5555/machines', machineData)
             .then(() => {
                 setLoading(false);
                 message.success('Machine task has successfully saved.');
@@ -72,7 +72,7 @@ function AddNewMachineTask() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('https://elemahana-backend.vercel.app/transactions', transactionData)
+            .post('http://localhost:5555/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

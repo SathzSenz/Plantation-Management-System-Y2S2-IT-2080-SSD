@@ -14,7 +14,7 @@ function HarvestCalculator() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/record')
+            .get('http://localhost:5555/record')
             .then((response) => {
                 setHarvestRecords(response.data.data);
                 setLoading(false);

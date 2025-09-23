@@ -15,7 +15,7 @@ export default function FeedbackDashboard() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get("https://elemahana-backend.vercel.app/feedback")
+            .get("http://localhost:5555/feedback")
             .then((response) => {
                 setFeedbackData(response.data.data);
                 setLoading(false);

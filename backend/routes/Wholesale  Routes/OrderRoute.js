@@ -1,10 +1,11 @@
 import express, {request, response} from "express";
 import {Orders} from '../../models/Wholesale Models/OrderModel.js'
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 const router = express.Router();
 
-router.post('/', async(request, response) =>{
-    try{
+router.post('/', asyncHandler(async(request, response) =>{
         if(
             !request.body.orderId ||
             !request.body.orderProductName ||
@@ -14,9 +15,7 @@ router.post('/', async(request, response) =>{
             !request.body.orderProductPricePerKilo ||
             !request.body.orderStatus
         ){
-            return response.status(400).send ({
-                message: 'Send all required fields',
-        });
+            throw createValidationError('Send all required fields');
     }
         const newOrder = {
             orderId: request.body.orderId,
@@ -29,80 +28,51 @@ router.post('/', async(request, response) =>{
         };
 
         const order = await Orders.create(newOrder);
+        return response.success(order, 201);
+}));
 
-        return response.status(201).send(order);
-    }catch (error){
-        console.log(error.message);
-        response.status(500).send({message:error.message});
-    }
-});
-
-router.get('/', async (request,response) =>{
-    try{
+router.get('/', asyncHandler(async (request,response) =>{
         const orderrecords = await Orders.find({});
-        return response.status(200).json({
+        return response.success({
             count: orderrecords.length,
             data: orderrecords
         });
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+}));
 
-router.put('/:id', async (request, response) =>{
-    try{
+router.put('/:id', asyncHandler(async (request, response) =>{
         if(
             !request.body.orderQuantity
         ){
-            return response.status(400).send({
-                message: 'Send all required fields'
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const {id} = request.params;
 
-        const result = await Orders.findByIdAndUpdate(id, request.body);
+        const result = await Orders.findByIdAndUpdate(id, request.body, { new: true });
 
         if(!result){
-            return response.status(404).json({message: 'Order Records not Founded'});
+            throw createNotFoundError('Order record');
         }
+        return response.success({ message: 'Order record updated successfully', data: result });
+}));
 
-        return response.status(200).send({ message: 'Order record updated successfully' });
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
-
-router.get('/:id', async (request, response) =>{
-    try{
+router.get('/:id', asyncHandler(async (request, response) =>{
         const {id} =request.params;
 
         const orderRecords = await Orders.findById(id);
+        if (!orderRecords) throw createNotFoundError('Order record');
+        return response.success(orderRecords);
+}));
 
-        return response.status(200).json(orderRecords);
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
-
-router.delete('/:id', async(request, response) =>{
-    try{
+router.delete('/:id', asyncHandler(async(request, response) =>{
         const {id} = request.params;
 
         const result = await Orders.findByIdAndDelete(id);
 
         if(!result){
-            return response.status(404).json({message: 'Order Record not found'});
+            throw createNotFoundError('Order record');
         }
-
-        return response.status(200).send({message: 'Order Record delete Successfully'});
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({message: 'Order Record delete Successfully'});
+}));
 
 export default router;

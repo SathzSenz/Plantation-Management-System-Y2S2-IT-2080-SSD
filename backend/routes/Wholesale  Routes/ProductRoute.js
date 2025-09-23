@@ -1,12 +1,13 @@
 import express, {request, response} from "express";
 import { Products } from '../../models/Wholesale Models/ProductModel.js';
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 // import upload from "../../ProductPictures/Pictures.js";
 
 
 const router = express.Router();
 
-router.post('/', async (request, response) => {
-    try {
+router.post('/', asyncHandler(async (request, response) => {
         if (
             !request.body.productID ||
             !request.body.productName ||
@@ -15,9 +16,7 @@ router.post('/', async (request, response) => {
             !request.body.productPrice
             // !request.file
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const newProduct = {
@@ -30,40 +29,22 @@ router.post('/', async (request, response) => {
         };
 
         const product = await Products.create(newProduct);
-
-        return response.status(201).send(product);
-    } catch (error) {
-        console.log(error.message);
-
-        // If the error is a Mongoose validation error, return a 400 Bad Request with the error messages
-        if (error.name === 'ValidationError') {
-            return response.status(400).send({ message: error.message });
-        }
-
-        // For other errors, return a 500 Internal Server Error with the error message
-        return response.status(500).send({ message: 'Internal Server Error' });
-    }
-});
+        return response.success(product, 201);
+}));
 
 
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const productrecords = await Products.find({});
-        return response.status(200).json({
+        return response.success({
             count: productrecords.length,
             data: productrecords
         });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+}));
 
 
 
 
-router.get('/:id', async(request,response) =>{
-    try{
+router.get('/:id', asyncHandler(async(request,response) =>{
         const  {id} = request.params;
 
         // if(!id){
@@ -71,21 +52,16 @@ router.get('/:id', async(request,response) =>{
         // }
 
         const  productRecords = await Products.findById(id);
-
-        return response.status(200).json(productRecords);
+        if (!productRecords) throw createNotFoundError('Product record');
+        return response.success(productRecords);
         // if(!productRecords){
         //     return response.status(404).json({ message: 'Product Record not found' });
         // }
         //return response.status(200).jason(productRecords);
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+}));
 
 
-router.put('/:id', async (request, response) => {
-    try{
+router.put('/:id', asyncHandler(async (request, response) => {
         if(
             !request.body.productID ||
             !request.body.productName ||
@@ -93,42 +69,28 @@ router.put('/:id', async (request, response) => {
             !request.body.productQuantity ||
             !request.body.productPrice
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields'
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const { id } = request.params;
 
-        const result = await Products.findByIdAndUpdate(id, request.body);
+        const result = await Products.findByIdAndUpdate(id, request.body, { new: true });
 
         if(!result){
-            return response.status(404).json({message: 'Product Records not Founded'});
+            throw createNotFoundError('Product record');
         }
-
-        return response.status(200).send({ message: 'Product record updated successfully' });
-
-    }catch (error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success({ message: 'Product record updated successfully', data: result });
+}));
 
 router.delete('/:id', async (request, response) =>{
-    try{
         const { id } = request.params;
 
         const  result = await Products.findByIdAndDelete(id);
 
         if(!result){
-            return response.status(404).json({message: 'Product Record not found'});
+            throw createNotFoundError('Product record');
         }
-
-        return response.status(200).send({message: 'Product Record delete Successfully'});
-    }catch (error){
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
+        return response.success({message: 'Product Record delete Successfully'});
 });
 
 export default router;

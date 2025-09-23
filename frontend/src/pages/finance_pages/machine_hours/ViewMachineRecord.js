@@ -25,7 +25,7 @@ export default function ViewMachineRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/machines/${id}`)
+            .get(`http://localhost:5555/machines/${id}`)
             .then((response) => {
                 setMachineRecord(response.data);
                 setLoading(false);
@@ -39,7 +39,7 @@ export default function ViewMachineRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/machineRecord`)
+            .get(`http://localhost:5555/machineRecord`)
             .then((response) => {
                 setMachineRecordDetails(response.data);
                 setLoading(false);

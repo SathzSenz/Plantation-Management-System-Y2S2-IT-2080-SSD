@@ -22,7 +22,7 @@ const AddEqMain = () => {
 
     useEffect(() => {
         axios
-            .get('https://elemahana-backend.vercel.app/inventoryinputs')
+            .get('http://localhost:5555/inventoryinputs')
             .then((response) => {
                 const filteredEquipments = response.data.data
                     .filter((item) => item.type === 'Equipments')
@@ -97,7 +97,7 @@ const AddEqMain = () => {
                 method: 'Automated Entry',
             };
 
-            await axios.post('https://elemahana-backend.vercel.app/transactions', transactionData);
+            await axios.post('http://localhost:5555/transactions', transactionData);
         }
 
         const data = {
@@ -113,7 +113,7 @@ const AddEqMain = () => {
         };
 
         try {
-            await axios.post('https://elemahana-backend.vercel.app/inventoryrecords', data);
+            await axios.post('http://localhost:5555/inventoryrecords', data);
             enqueueSnackbar('Record Created Successfully!', { variant: 'success' });
             navigate('/inventory/maintenancelog', { state: { highlighted: true } });
         } catch (error) {

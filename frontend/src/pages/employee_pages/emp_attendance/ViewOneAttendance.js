@@ -27,7 +27,7 @@ export default function ViewOneAttendance() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/attendanceRecords/${id}`)
+            .get(`http://localhost:5555/attendanceRecords/${id}`)
             .then((response) => {
                 setAttendanceRecord(response.data);
                 setLoading(false);

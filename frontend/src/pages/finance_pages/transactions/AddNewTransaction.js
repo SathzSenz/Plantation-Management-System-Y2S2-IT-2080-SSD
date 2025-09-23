@@ -64,7 +64,7 @@ function AddNewTransaction() {
 
         setLoading(true);
         try {
-            await axios.post('https://elemahana-backend.vercel.app/transactions', data);
+            await axios.post('http://localhost:5555/transactions', data);
             setLoading(false);
             message.success('Transaction record has successfully saved.');
             navigate('/finances/transactions');

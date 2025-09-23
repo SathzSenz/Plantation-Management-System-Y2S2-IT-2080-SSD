@@ -4,12 +4,13 @@ import {InventoryRecord} from "../../models/Inventory Models/EqMaintainModel.js"
 import {InventoryInput} from "../../models/Inventory Models/InventoryRecordModel.js";
 import {subMonths, subYears, format, subWeeks} from "date-fns";
 import {CropInputs} from "../../models/Crop Models/CropInputModel.js";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 const router = express.Router();
 
 //create new disease record
-router.post('/', async (request, response) => {
-    try{
+router.post('/', asyncHandler(async (request, response) => {
         console.log('Request Body:', request.body);
         if (
             !request.body.disease_name ||
@@ -22,9 +23,7 @@ router.post('/', async (request, response) => {
             !request.body.severity ||
             !request.body.status
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         if(request.body.status === "Under Treatment") {
@@ -41,7 +40,7 @@ router.post('/', async (request, response) => {
             const inventoryRecords = await InventoryInput.find({ record_name: treatment });
 
             if (inventoryRecords.length === 0) {
-                return response.status(400).json({ message: treatmentNotFoundMessage });
+                throw createValidationError(treatmentNotFoundMessage);
             }
 
             for (const inventoryRecord of inventoryRecords) {
@@ -57,7 +56,7 @@ router.post('/', async (request, response) => {
             }
             // If no record had sufficient quantity, return a message
             if (!foundSufficientInventory) {
-                return response.status(400).json({ message: insufficientInventoryMessage });
+                throw createValidationError(insufficientInventoryMessage);
             }
         }
 
@@ -74,31 +73,16 @@ router.post('/', async (request, response) => {
         };
 
         const disease = await DiseasesRecord.create(newDiseaseRecord);
-
-        return response.status(201).send(disease);
-    }catch(error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-} );
+        return response.success(disease, 201);
+} ));
 
 //get disease records
-router.get('/', async (request, response) => {
-    try{
+router.get('/', asyncHandler(async (request, response) => {
         const disease = await DiseasesRecord.find({});
+        return response.success({ count : disease.length, data : disease });
+}));
 
-        return response.status(200).json({
-            count : disease.length,
-            data : disease
-        });
-    }catch (error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
-
-router.get('/g', async (request, response) => {
-    try {
+router.get('/g', asyncHandler(async (request, response) => {
         const timeline = request.query.timeline
         let startDate;
 
@@ -122,34 +106,20 @@ router.get('/g', async (request, response) => {
             date: { $gte: formattedStartDate, $lte: format(new Date(), 'yyyy-MM-dd') } // Filter records from start date to current date
         });
 
-        return response.status(200).json({
-            count: diseases.length,
-            data: diseases
-        });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ count: diseases.length, data: diseases });
+}));
 
 //get disease record by id
-router.get('/:id', async (request, response) => {
-    try{
+router.get('/:id', asyncHandler(async (request, response) => {
         const {id} = request.params;
 
         const disease = await DiseasesRecord.findById(id);
-
-        return response.status(200).json(disease);
-
-    }catch (error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        if (!disease) throw createNotFoundError('Disease record');
+        return response.success(disease);
+}));
 
 //updating disease record
-router.put('/:id', async (request, response) => {
-    try{
+router.put('/:id', asyncHandler(async (request, response) => {
         if (
             !request.body.disease_name ||
             !request.body.plant_id||
@@ -161,9 +131,7 @@ router.put('/:id', async (request, response) => {
             !request.body.severity ||
             !request.body.status
         ) {
-            return response.status(400).send({
-                message : 'Send all required fields'
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const {id} = request.params;
@@ -186,7 +154,7 @@ router.put('/:id', async (request, response) => {
             const inventoryRecords = await InventoryInput.find({ record_name: treatment });
 
             if (inventoryRecords.length === 0) {
-                return response.status(400).json({ message: treatmentNotFoundMessage });
+                throw createValidationError(treatmentNotFoundMessage);
             }
 
             for (const inventoryRecord of inventoryRecords) {
@@ -210,58 +178,39 @@ router.put('/:id', async (request, response) => {
             }
             // If no record had sufficient quantity, return a message
             if (!foundSufficientInventory) {
-                return response.status(400).json({ message: insufficientInventoryMessage });
+                throw createValidationError(insufficientInventoryMessage);
             }
         }
 
-        const result = await DiseasesRecord.findByIdAndUpdate(id, request.body);
-
+        const result = await DiseasesRecord.findByIdAndUpdate(id, request.body, { new: true });
         if(!result){
-            return response.status(404).json({message : 'Disease record not found'});
+            throw createNotFoundError('Disease record');
         }
-
-        return response.status(200).send({message : 'Disease record updated successfully'});
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success({message : 'Disease record updated successfully', data: result});
+}));
 
 //delete disease record
-router.delete('/:id', async (request, response) => {
-    try{
+router.delete('/:id', asyncHandler(async (request, response) => {
         const {id} = request.params;
 
         const result = await DiseasesRecord.findByIdAndDelete(id);
 
         if(!result){
-            return response.status(404).json({message: 'Disease record not found' });
+            throw createNotFoundError('Disease record');
         }
+        return response.success({message : 'Disease record deleted successfully'});
+}));
 
-        return response.status(200).send({message : 'Disease record deleted successfully'});
-
-    }catch(error){
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
-
-router.get('/cropTypes', async (req, res) => {
+router.get('/cropTypes', asyncHandler(async (req, res) => {
     const { location } = req.query;
     console.log('Selected location:', location);
-    try {
-        const cropRecords = await CropInputs.find({ field: location, cropType: {$exists: true} });
-        console.log('Crop Types',cropRecords);
+    const cropRecords = await CropInputs.find({ field: location, cropType: {$exists: true} });
+    console.log('Crop Types',cropRecords);
 
-        const crops = cropRecords.map(record => record.cropType);
-        const uniqueCropTypes = [...new Set(crops)];
+    const crops = cropRecords.map(record => record.cropType);
+    const uniqueCropTypes = [...new Set(crops)];
 
-        res.json(uniqueCropTypes);
-
-    } catch (error) {
-        console.error('Error fetching crop types:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
+    res.success(uniqueCropTypes);
+}));
 
 export default router;

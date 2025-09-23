@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon, UserCircleIcon as UserCircleIconSolid } from '@heroicons/react/20/solid';
 import {Link} from "react-router-dom";
+import { safeFetch } from "../../apiClient";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -42,7 +43,7 @@ export default function Navbar() {
     const fetchData = async () => {
         try {
             const accessToken = await getToken();
-            const res = await fetch(`https://elemahana.kinde.com/api`, {
+            const res = await safeFetch(`https://elemahana.kinde.com/api`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }

@@ -35,7 +35,7 @@ export default function AddCropInputForm() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/inventoryinputs`)
+            .get(`http://localhost:5555/inventoryinputs`)
             .then((response) => {
                 const inventoryInputsData = response.data.data;
                 const cropTypesWithQuantity = inventoryInputsData
@@ -124,7 +124,7 @@ export default function AddCropInputForm() {
 
         try {
             const response = await axios.post(
-                "https://elemahana-backend.vercel.app/cropinput",
+                "http://localhost:5555/cropinput",
                 formData
             );
             console.log(response.data);

@@ -13,7 +13,7 @@ const FeedbackList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/feedback`)
+            .get(`http://localhost:5555/feedback`)
             .then((response) => {
                 setFeedbackRecords(response.data.data);
                 setLoading(false);
@@ -43,7 +43,7 @@ const FeedbackList = () => {
     };
     const handleDelete = (recordId) => {
         axios
-            .delete(`https://elemahana-backend.vercel.app/feedback/${recordId}`)
+            .delete(`http://localhost:5555/feedback/${recordId}`)
             .then(() => {
                 setFeedbackRecords((prevRecords) => prevRecords.filter((record) => record._id !== recordId));
             })

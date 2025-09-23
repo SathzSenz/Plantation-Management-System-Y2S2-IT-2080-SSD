@@ -12,7 +12,7 @@ function NewBox() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/waterRecords`)
+            .get(`http://localhost:5555/waterRecords`)
             .then((response) => {
                 setWaterRecords(response.data.data);
                 setLoading(false);

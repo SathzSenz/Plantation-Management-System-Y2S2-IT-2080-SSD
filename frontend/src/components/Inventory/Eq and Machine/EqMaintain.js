@@ -19,7 +19,7 @@ const EqMaintain = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/inventoryrecords`)
+            .get(`http://localhost:5555/inventoryrecords`)
             .then((response) => {
                 setInventoryRecords(response.data.data);
                 setLoading(false);
@@ -46,7 +46,7 @@ const EqMaintain = () => {
     const handleConfirmDelete = () => {
         const recordId = selectedRecordId;
         axios
-            .delete(`https://elemahana-backend.vercel.app/inventoryrecords/${recordId}`)
+            .delete(`http://localhost:5555/inventoryrecords/${recordId}`)
             .then(() => {
                 setInventoryRecords(prevRecords => prevRecords.filter(record => record._id !== recordId));
                 setShowConfirmation(false);

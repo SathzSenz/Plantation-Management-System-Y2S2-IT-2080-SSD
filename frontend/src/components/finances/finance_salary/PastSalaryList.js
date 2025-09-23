@@ -36,7 +36,7 @@ export default function PastSalaryList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/salary')
+            .get('http://localhost:5555/salary')
             .then((response) => {
                 setSalaryRecords(response.data.data);
                 setLoading(false);
@@ -52,7 +52,7 @@ export default function PastSalaryList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/salary/${id}`)
+                .delete(`http://localhost:5555/salary/${id}`)
                 .then(() => {
                     setSalaryRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     message.success('Salary record successfully deleted.');

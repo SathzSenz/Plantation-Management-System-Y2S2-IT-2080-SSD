@@ -19,7 +19,7 @@ const OrderEditingForm = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/orderRecords/${id}`)
+            .get(`http://localhost:5555/orderRecords/${id}`)
             .then((response) => {
                 setProduct(response.data);
                 setOrderQuantity(response.data.orderQuantity);
@@ -68,7 +68,7 @@ const OrderEditingForm = () => {
         };
         setLoading(true);
         axios
-            .put(`https://elemahana-backend.vercel.app/orderRecords/${id}`, data)
+            .put(`http://localhost:5555/orderRecords/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited successfully', { variant: 'success' });

@@ -16,7 +16,7 @@ export default function GenerateGraphs() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/diseases/g?timeline=${timeLineFilter}`)
+            .get(`http://localhost:5555/diseases/g?timeline=${timeLineFilter}`)
             .then((response) => {
                 setDiseaseRecords(response.data.data);
                 setLoading(false);

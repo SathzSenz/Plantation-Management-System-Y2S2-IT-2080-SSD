@@ -54,6 +54,12 @@ app.use(cors({
     allowedHeaders: ['Content-Type'],
 }));
 
+// response helpers and request id
+import { attachResponseHelpers } from './middleware/responseMiddleware.js';
+import { requestIdMiddleware, notFoundMiddleware, errorHandler } from './middleware/errorMiddleware.js';
+app.use(requestIdMiddleware);
+app.use(attachResponseHelpers);
+
 app.get('/', (request, response) => {
     console.log(request);
     return response.status(234).send('welcome to Elemahana');
@@ -99,6 +105,9 @@ app.use('/record', recordRoute);
 app.use('/checkTreatment',TreatmentSelectionRoute);
 app.use('/count', DiseaseCountRoute);
 
+// 404 for unmatched routes
+app.use(notFoundMiddleware);
+
 mongoose
     .connect(mongoDBURL)
     .then(() => {
@@ -111,3 +120,5 @@ mongoose
         console.log(error);
     });
 
+// centralized error handler must be the last middleware
+app.use(errorHandler);

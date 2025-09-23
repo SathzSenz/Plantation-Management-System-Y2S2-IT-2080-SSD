@@ -1,12 +1,13 @@
 import express from 'express';
 import { WaterRecord } from "../../models/Inventory Models/waterModel.js";
 import mongoose from "mongoose";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 const router = express.Router();
 
 // Save a new water record
-router.post('/', async (request, response) => {
-    try {
+router.post('/', asyncHandler(async (request, response) => {
         const {
             water_level1,
             water_level2,
@@ -16,9 +17,7 @@ router.post('/', async (request, response) => {
 
         // Check if all required fields are present - validation
         if (!water_level1 || !water_level2 || !water_date || !water_des) {
-            return response.status(400).send({
-                message: 'All required data must be provided',
-            });
+            throw createValidationError('All required data must be provided');
         }
         const newWaterRecord = await WaterRecord.create({
             water_level1,
@@ -26,49 +25,30 @@ router.post('/', async (request, response) => {
             water_date,
             water_des
         });
-        return response.status(201).send(newWaterRecord);
-
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success(newWaterRecord, 201);
+}));
 
 // Get all water records
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const waterRecords = await WaterRecord.find({});
-        return response.status(200).json({
-            count: waterRecords.length,
-            data: waterRecords
-        });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ count: waterRecords.length, data: waterRecords });
+}));
 
 // Get water record by ID
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
         if (!id) {
-            return response.status(400).json({ message: 'ID parameter is required' });
+            throw createValidationError('ID parameter is required');
         }
         const waterRecord = await WaterRecord.findById(id);
         if (!waterRecord) {
-            return response.status(404).json({ message: 'water Record not found' });
+            throw createNotFoundError('Water record');
         }
-        return response.status(200).json(waterRecord);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success(waterRecord);
+}));
 
 // Update water record
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
         const {
             water_level1,
@@ -77,38 +57,26 @@ router.put('/:id', async (request, response) => {
             water_des
         } = request.body;
         if (!water_level1 || !water_level2 || !water_date || !water_des) {
-            return response.status(400).send({
-                message: 'All required data must be provided',
-            });
+            throw createValidationError('All required data must be provided');
         }
 
         // Find and update the water record
         const updatedRecord = await WaterRecord.findByIdAndUpdate(id, request.body, { new: true });
 
         if (!updatedRecord) {
-            return response.status(404).json({ message: 'water record not found' });
+            throw createNotFoundError('Water record');
         }
-
-        return response.status(200).send(updatedRecord);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success(updatedRecord);
+}));
 
 // Delete water record
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
         const result = await WaterRecord.findByIdAndDelete(id);
         if (!result) {
-            return response.status(404).json({ message: 'Water record not found' });
+            throw createNotFoundError('Water record');
         }
-        return response.status(200).send({ message: 'Water record deleted successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Water record deleted successfully' });
+}));
 
 export default router;

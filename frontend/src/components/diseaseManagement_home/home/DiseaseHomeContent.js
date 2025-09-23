@@ -20,7 +20,7 @@ export default function DiseaseHomeContent(){
     useEffect(() => {
         setLoading(true);
         axios
-            .get("https://elemahana-backend.vercel.app/count/untreatedPlants")//fetches count of untreated plants from the endpoint
+            .get("http://localhost:5555/count/untreatedPlants")//fetches count of untreated plants from the endpoint
             .then((response) => {
                 setUntreatedPlantsCount(response.data.totalTreesAffected); //assigns the count received to the variable
                 setLoading(false);
@@ -31,7 +31,7 @@ export default function DiseaseHomeContent(){
             });
 
         axios
-            .get("https://elemahana-backend.vercel.app/count/recoveredPlants")//fetches count of recoveredplants from the endpoint
+            .get("http://localhost:5555/count/recoveredPlants")//fetches count of recoveredplants from the endpoint
             .then((response) => {
                 setRecoveredPlantsCount(response.data.totalTreesAffected);//assigns the count received to the variable
                 setLoading(false);
@@ -42,7 +42,7 @@ export default function DiseaseHomeContent(){
             });
 
         axios
-            .get("https://elemahana-backend.vercel.app/count/underTreatmentPlants")//fetches count of plants under treatment from the endpoint
+            .get("http://localhost:5555/count/underTreatmentPlants")//fetches count of plants under treatment from the endpoint
             .then((response) => {
                 setUnderTreatmentPlantsCount(response.data.totalTreesAffected);//assigns the count received to the variable
                 setLoading(false);
@@ -53,7 +53,7 @@ export default function DiseaseHomeContent(){
             });
 
         axios
-            .get("https://elemahana-backend.vercel.app/diseases")//fetches information about records
+            .get("http://localhost:5555/diseases")//fetches information about records
             .then((response) => {
                 setDiseaseRecords(response.data.data); //assigns values in the array of disease records
                 console.log("DiseaseRecords:", response.data.data);

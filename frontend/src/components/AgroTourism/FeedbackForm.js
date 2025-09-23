@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { safeFetch } from "../../apiClient";
 import { Link, useNavigate } from "react-router-dom";
 import { SlActionUndo } from "react-icons/sl";
 
@@ -16,7 +17,7 @@ const FeedbackForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("https://elemahana-backend.vercel.app/feedback", {
+            const response = await safeFetch("http://localhost:5555/feedback", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -28,9 +29,7 @@ const FeedbackForm = () => {
                     rating,
                 }),
             });
-            if (!response.ok) {
-                throw new Error("Failed to submit feedback");
-            }
+            // safeFetch throws on non-OK; response here is OK
             // Reset form fields after successful submission
             setName("");
             setEmail("");

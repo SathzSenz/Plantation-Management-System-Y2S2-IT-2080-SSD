@@ -18,7 +18,7 @@ const EditBooking = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://elemahana-backend.vercel.app/booking/${id}`)
+        axios.get(`http://localhost:5555/booking/${id}`)
             .then((response) => {
                 const { name, telNo, nicNo, email, selectedPackage, numberOfDays,numberOfPeople } = response.data;
                 setFullName(name);
@@ -49,7 +49,7 @@ const EditBooking = () => {
         const data = { name, telNo, nicNo, email, selectedPackage, numberOfDays, numberOfPeople };
         setLoading(true);
         try {
-            await axios.put(`https://elemahana-backend.vercel.app/booking/${id}`, data);
+            await axios.put(`http://localhost:5555/booking/${id}`, data);
             console.log("Form submitted successfully");
             setLoading(false);
             enqueueSnackbar('Record Edited successfully', { variant: 'success', anchorOrigin: { vertical: 'top', horizontal: 'center' } });

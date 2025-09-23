@@ -46,7 +46,7 @@ const PlantingList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/cropinput`)
+            .get(`http://localhost:5555/cropinput`)
             .then((response) => {
                 const formattedRecords = response.data.data
                     .filter(record => record.type === "Planting")
@@ -84,7 +84,7 @@ const PlantingList = () => {
     const confirmDelete = () => {
         if (recordToDelete) {
             axios
-                .delete(`https://elemahana-backend.vercel.app/cropinput/${recordToDelete}`)
+                .delete(`http://localhost:5555/cropinput/${recordToDelete}`)
                 .then(() => {
                     setPlantingRecords(prevRecords =>
                         prevRecords.filter(record => record._id !== recordToDelete)

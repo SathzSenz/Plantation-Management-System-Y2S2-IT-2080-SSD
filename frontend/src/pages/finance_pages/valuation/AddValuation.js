@@ -53,7 +53,7 @@ function AddNewValuation() {
         };
         setLoading(true);
         axios
-            .post('https://elemahana-backend.vercel.app/valuation', data)
+            .post('http://localhost:5555/valuation', data)
             .then(() => {
                 setLoading(false);
                 message.success('Valuation record has successfully saved.');
@@ -87,7 +87,7 @@ function AddNewValuation() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('https://elemahana-backend.vercel.app/transactions', transactionData)
+            .post('http://localhost:5555/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

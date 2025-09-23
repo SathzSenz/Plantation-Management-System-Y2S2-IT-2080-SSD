@@ -1,11 +1,12 @@
 import {MachinesRecord} from "../../models/Finance Models/MachineRecordModel.js";
 import express from "express";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 const router = express.Router();
 
 // create a new record
-router.post('/', async (request, response) => {
-    try {
+router.post('/', asyncHandler(async (request, response) => {
         if (
             !request.body.task_id ||
             !request.body.record_date ||
@@ -13,9 +14,7 @@ router.post('/', async (request, response) => {
             !request.body.reading_end ||
             !request.body.record_pay
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const NewMachinesRecord = {
@@ -27,47 +26,27 @@ router.post('/', async (request, response) => {
         };
 
         const MachineRecord = await MachinesRecord.create(NewMachinesRecord);
-        return response.status(201).send(MachineRecord);
-
-    }catch (error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success(MachineRecord, 201);
+}));
 
 // Route for Get All from database
 
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const MachineRecord = await MachinesRecord.find({});
-
-        return response.status(200).json({
-            count: MachineRecord.length,
-            data: MachineRecord,
-        });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ count: MachineRecord.length, data: MachineRecord });
+}));
 
 // Route for Get One transaction from database by id
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const MachineRecord = await MachinesRecord.findById(id);
-
-        return response.status(200).json(MachineRecord);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        if (!MachineRecord) throw createNotFoundError('Machine record');
+        return response.success(MachineRecord);
+}));
 
 // Route for Update a transaction
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         if (
             !request.body.task_id ||
             !request.body.record_date ||
@@ -75,42 +54,29 @@ router.put('/:id', async (request, response) => {
             !request.body.reading_end ||
             !request.body.record_pay
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const { id } = request.params;
 
-        const result = await MachinesRecord.findByIdAndUpdate(id, request.body);
+        const result = await MachinesRecord.findByIdAndUpdate(id, request.body, { new: true });
 
         if (!result) {
-            return response.status(404).json({ message: 'Transaction record not found' });
+            throw createNotFoundError('Machine record');
         }
-
-        return response.status(200).send({ message: 'Transaction record updated successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Machine record updated successfully', data: result });
+}));
 
 // Route for Delete a book
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const result = await MachinesRecord.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).json({ message: 'Transaction record not found' });
+            throw createNotFoundError('Machine record');
         }
-
-        return response.status(200).send({ message: 'Transaction record deleted successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Machine record deleted successfully' });
+}));
 
 export default router;

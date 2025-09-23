@@ -35,7 +35,7 @@ const EmployeeList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/employeeRecords`)
+            .get(`http://localhost:5555/employeeRecords`)
             .then((response) => {
                 setRegistrationRecords(response.data.data);
                 setLoading(false);
@@ -67,7 +67,7 @@ const EmployeeList = () => {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/employeeRecords/${id}`)
+                .delete(`http://localhost:5555/employeeRecords/${id}`)
                 .then(() => {
                     setRegistrationRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     setLoading(false);

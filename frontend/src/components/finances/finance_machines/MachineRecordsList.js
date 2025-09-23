@@ -46,7 +46,7 @@ export default function MachineRecordsList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/machines')
+            .get('http://localhost:5555/machines')
             .then((response) => {
                 setMachineRecords(response.data.data);
                 setLoading(false);
@@ -60,7 +60,7 @@ export default function MachineRecordsList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/machineRecord')
+            .get('http://localhost:5555/machineRecord')
             .then((response) => {
                 setMachineRecordDetails(response.data.data);
                 setLoading(false);
@@ -76,7 +76,7 @@ export default function MachineRecordsList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/machines/${id}`)
+                .delete(`http://localhost:5555/machines/${id}`)
                 .then(() => {
                     setMachineRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     message.success('Machine record successfully deleted.');
@@ -95,7 +95,7 @@ export default function MachineRecordsList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/machineRecord/${id}`)
+                .delete(`http://localhost:5555/machineRecord/${id}`)
                 .then(() => {
                     setMachineRecordDetails((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     message.success('Machine detail record successfully deleted.');
@@ -180,7 +180,7 @@ export default function MachineRecordsList() {
         try {
             // Make POST request to the API endpoint
             const response = await
-                axios.post('https://elemahana-backend.vercel.app/machineRecord', payload);
+                axios.post('http://localhost:5555/machineRecord', payload);
 
             // Handle success response
             console.log('Record added successfully:', response.data);
@@ -221,7 +221,7 @@ export default function MachineRecordsList() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('https://elemahana-backend.vercel.app/transactions', transactionData)
+            .post('http://localhost:5555/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

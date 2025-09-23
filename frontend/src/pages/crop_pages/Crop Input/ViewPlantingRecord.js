@@ -21,7 +21,7 @@ export default function ViewPlantingRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/cropinput/${id}`)
+            .get(`http://localhost:5555/cropinput/${id}`)
     .then((response) => {
             setRecord(response.data);
             setLoading(false);

@@ -1,11 +1,12 @@
 import {TransactionsRecord} from "../../models/Finance Models/TransactionsModel.js";
 import express from "express";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
 const router = express.Router();
 
 // create a new record
-router.post('/', async (request, response) => {
-    try {
+router.post('/', asyncHandler(async (request, response) => {
         if (
             !request.body.date ||
             !request.body.type ||
@@ -15,9 +16,7 @@ router.post('/', async (request, response) => {
             !request.body.payer_payee ||
             !request.body.method
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields: date, type, amount',
-            });
+            throw createValidationError('Send all required fields: date, type, subtype, amount, description, payer_payee, method');
         }
 
         const NewTransactionsRecord = {
@@ -31,47 +30,27 @@ router.post('/', async (request, response) => {
         };
 
         const TransactionRecord = await TransactionsRecord.create(NewTransactionsRecord);
-        return response.status(201).send(TransactionRecord);
-
-    }catch (error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success(TransactionRecord, 201);
+}));
 
 // Route for Get All from database
 
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const TransactionRecord = await TransactionsRecord.find({});
-
-        return response.status(200).json({
-            count: TransactionRecord.length,
-            data: TransactionRecord,
-        });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ count: TransactionRecord.length, data: TransactionRecord });
+}));
 
 // Route for Get One transaction from database by id
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const TransactionRecord = await TransactionsRecord.findById(id);
-
-        return response.status(200).json(TransactionRecord);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        if (!TransactionRecord) throw createNotFoundError('Transaction record');
+        return response.success(TransactionRecord);
+}));
 
 // Route for Update a transaction
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         if (
             !request.body.date ||
             !request.body.type ||
@@ -81,42 +60,29 @@ router.put('/:id', async (request, response) => {
             !request.body.payer_payee ||
             !request.body.method
         ) {
-            return response.status(400).send({
-                message: 'Send all required fields: title, author, publishYear',
-            });
+            throw createValidationError('Send all required fields: date, type, subtype, amount, description, payer_payee, method');
         }
 
         const { id } = request.params;
 
-        const result = await TransactionsRecord.findByIdAndUpdate(id, request.body);
+        const result = await TransactionsRecord.findByIdAndUpdate(id, request.body, { new: true });
 
         if (!result) {
-            return response.status(404).json({ message: 'Transaction record not found' });
+            throw createNotFoundError('Transaction record');
         }
-
-        return response.status(200).send({ message: 'Transaction record updated successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Transaction record updated successfully', data: result });
+}));
 
 // Route for Delete a book
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         const result = await TransactionsRecord.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).json({ message: 'Transaction record not found' });
+            throw createNotFoundError('Transaction record');
         }
-
-        return response.status(200).send({ message: 'Transaction record deleted successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Transaction record deleted successfully' });
+}));
 
 export default router;

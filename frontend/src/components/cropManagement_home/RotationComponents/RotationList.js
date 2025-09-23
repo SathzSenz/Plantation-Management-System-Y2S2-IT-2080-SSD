@@ -40,7 +40,7 @@ const RotationList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/rotation`)
+            .get(`http://localhost:5555/rotation`)
             .then((response) => {
                 setRotationRecords(response.data.data);
                 setLoading(false);
@@ -71,7 +71,7 @@ const RotationList = () => {
     const confirmDelete = () => {
         if (recordToDelete) {
             axios
-                .delete(`https://elemahana-backend.vercel.app/rotation/${recordToDelete}`)
+                .delete(`http://localhost:5555/rotation/${recordToDelete}`)
                 .then(() => {
                     setRotationRecords(prevRecords =>
                         prevRecords.filter(record => record._id !== recordToDelete)
@@ -88,7 +88,7 @@ const RotationList = () => {
 
     const confirmDeleteAction = () => {
         axios
-            .delete(`https://elemahana-backend.vercel.app/rotation/${recordToDelete}`)
+            .delete(`http://localhost:5555/rotation/${recordToDelete}`)
             .then(() => {
                 setRotationRecords(prevRecords => prevRecords.filter(record => record._id !== recordToDelete));
             })

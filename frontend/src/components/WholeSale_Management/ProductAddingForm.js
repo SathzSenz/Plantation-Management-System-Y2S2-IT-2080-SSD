@@ -25,7 +25,7 @@ const ProductAddingForm = () => {
         };
 
         axios
-            .post('https://elemahana-backend.vercel.app/productRecords', data)
+            .post('http://localhost:5555/productRecords', data)
             .then(() => {
                 enqueueSnackbar('Record Created Successfully', { variant: 'success' });
                 navigate('/wholesaleDashboard', { state: { highlighted: true } });

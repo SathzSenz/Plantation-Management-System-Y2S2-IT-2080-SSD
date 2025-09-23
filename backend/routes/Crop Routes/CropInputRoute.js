@@ -1,10 +1,11 @@
 import express from 'express';
 import { CropInputs } from '../../models/Crop Models/CropInputModel.js';
+import { asyncHandler } from '../../middleware/errorMiddleware.js';
+import { createNotFoundError, createValidationError } from '../../utils/errors.js';
 
 const router = express.Router();
 
-router.post('/', async (request, response) => {
-    try {
+router.post('/', asyncHandler(async (request, response) => {
         const {
             date,
             type,
@@ -19,9 +20,7 @@ router.post('/', async (request, response) => {
 
         // Validate type
         if (!type || (type !== 'Agrochemical' && type !== 'Planting')) {
-            return response.status(400).send({
-                message: 'Invalid type provided',
-            });
+            throw createValidationError('Invalid type provided');
         }
 
         let requiredFields = ['date', 'type', 'field', 'quantity', 'remarks', 'unitCost']; // Add unitCost to requiredFields
@@ -33,9 +32,7 @@ router.post('/', async (request, response) => {
         const missingFields = requiredFields.filter(field => !(field in request.body));
 
         if (missingFields.length > 0) {
-            return response.status(400).send({
-                message: `Missing required fields: ${missingFields.join(', ')}`,
-            });
+            throw createValidationError(`Missing required fields: ${missingFields.join(', ')}`);
         }
         const newCropInput = {
             date,
@@ -53,84 +50,48 @@ router.post('/', async (request, response) => {
             newCropInput.chemicalName = chemicalName;
         }
         const cropInput = await CropInputs.create(newCropInput);
-
-        return response.status(201).send(cropInput);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success(cropInput, 201);
+}));
 
 // Get all records
-router.get('/', async (request, response) => {
-    try {
+router.get('/', asyncHandler(async (request, response) => {
         const cropInputs = await CropInputs.find({});
-
-        return response.status(200).json({
-            count: cropInputs.length,
-            data: cropInputs
-        });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ count: cropInputs.length, data: cropInputs });
+}));
 
 // Get one record by id
-router.get('/:id', async (request, response) => {
-    try {
+router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
-
         const cropInput = await CropInputs.findById(id);
-
-        return response.status(200).json(cropInput);
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        if (!cropInput) throw createNotFoundError('Crop input');
+        return response.success(cropInput);
+}));
 
 // Update record
-router.put('/:id', async (request, response) => {
-    try {
+router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         // Check if unitCost is present in the request body
         if (!request.body.date || !request.body.type || !request.body.field ||
             !request.body.quantity || !request.body.remarks || !request.body.unitCost) {
-            return response.status(400).send({
-                message: 'Send all required fields'
-            });
+            throw createValidationError('Send all required fields');
         }
 
-        const cropInput = await CropInputs.findByIdAndUpdate(id, request.body);
-
+        const cropInput = await CropInputs.findByIdAndUpdate(id, request.body, { new: true });
         if (!cropInput) {
-            return response.status(404).json({ message: 'Crop Input not found' });
+            throw createNotFoundError('Crop input');
         }
-
-        return response.status(200).send({ message: 'Crop Input updated successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Crop Input updated successfully', data: cropInput });
+}));
 
 // Route to delete a record
-router.delete('/:id', async (request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
         const cropInput = await CropInputs.findByIdAndDelete(id);
-
         if (!cropInput) {
-            return response.status(404).json({ message: 'Crop Input not found' });
+            throw createNotFoundError('Crop input');
         }
-
-        return response.status(200).send({ message: 'Crop Input deleted successfully' });
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-    }
-});
+        return response.success({ message: 'Crop Input deleted successfully' });
+}));
 
 export default router;

@@ -29,7 +29,7 @@ export default function CropThreeTile() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/cropinput')
+            .get('http://localhost:5555/cropinput')
             .then((response) => {
                 const plantingRecordsData = response.data.data;
                 const filteredPlantingRecords = plantingRecordsData.filter(record => record.type === 'Planting' && record.cropType === 'Apple Guava');
@@ -69,7 +69,7 @@ export default function CropThreeTile() {
             });
 
         axios
-            .get('https://elemahana-backend.vercel.app/marketprice')
+            .get('http://localhost:5555/marketprice')
             .then((response) => {
                 const marketPriceData = response.data.data;
                 const closestRecord = findClosestRecord(marketPriceData);

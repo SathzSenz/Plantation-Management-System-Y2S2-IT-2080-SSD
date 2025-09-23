@@ -12,7 +12,7 @@ function Emphome() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get('https://elemahana-backend.vercel.app/employeeRecords')
+        axios.get('http://localhost:5555/employeeRecords')
             .then(response => {
                 setEmployeeRecords(response.data.data)
                 setLoading(false);
@@ -25,7 +25,7 @@ function Emphome() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get('https://elemahana-backend.vercel.app/taskRecords')
+        axios.get('http://localhost:5555/taskRecords')
             .then(response => {
                 setTaskRecords(response.data.data);
                 setCompletedTasks(response.data.data.filter(task => task.task_status === "completed").length);

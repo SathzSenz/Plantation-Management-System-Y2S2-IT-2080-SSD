@@ -4,16 +4,17 @@ import {linearRegression, linearRegressionLine, } from "simple-statistics";
 import regression from "regression";
 import * as tf from '@tensorflow/tfjs';
 import {predictFuturePricesTF1} from "./predictionUtil.js";
+import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { createValidationError, createNotFoundError } from "../../utils/errors.js";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-    try {
+router.get('/', asyncHandler(async (req, res) => {
 
         const {name} = req.query;  //retrieves name as parameter
 
         if(!name) {
-            return res.status(400).json({ message : 'Fruit type is required'}); //display if name is not passed
+            throw createValidationError('Fruit type is required');
         }
 
         //retrieves records from parameter passed and sorts date in ascending order
@@ -21,7 +22,7 @@ router.get('/', async (req, res) => {
 
         //if no records available
         if (historicalData.length === 0) {
-            return res.status(404).json({ message: 'No historical data found for the specified fruit' });
+            throw createNotFoundError('No historical data found for the specified fruit');
         }
 
         const dates = historicalData.map(record => new Date(record.date)); //map dates
@@ -34,12 +35,8 @@ router.get('/', async (req, res) => {
         //call tensorflow predict function
         const futureTensorFlowModel = await predictFuturePricesTF1(dates, minPrices, maxPrices);
 
-        res.json({futureMaxPrices, futureMinPrices, futureTensorFlowModel}); //send generted prices
-    }catch(error) {
-        console.error('Error generating future market prices : ', error);
-        res.status(500).json({message: 'Error generating future market prices'});
-    }
-});
+        res.success({futureMaxPrices, futureMinPrices, futureTensorFlowModel}); //send generted prices
+}));
 
 //function to convert date format
 function formatDate(date) {

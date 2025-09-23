@@ -31,7 +31,7 @@ export default function RecordRotation() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://elemahana-backend.vercel.app/rotation', formData);
+            const response = await axios.post('http://localhost:5555/rotation', formData);
             console.log(response.data);
             setFormData({
                 season: '',

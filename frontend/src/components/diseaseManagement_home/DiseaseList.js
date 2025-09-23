@@ -28,7 +28,7 @@ export default function DiseaseList() {
    useEffect(() => {
        setLoading(true);
        axios
-           .get('https://elemahana-backend.vercel.app/diseases')
+           .get('http://localhost:5555/diseases')
            .then((response) => {
                setDiseaseRecords(response.data.data);
                setLoading(false);
@@ -44,7 +44,7 @@ export default function DiseaseList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`https://elemahana-backend.vercel.app/diseases/${id}`)
+                .delete(`http://localhost:5555/diseases/${id}`)
                 .then(() => {
                     // Update state after successful deletion
                     setDiseaseRecords(prevRecords => prevRecords.filter(record => record._id !== id));

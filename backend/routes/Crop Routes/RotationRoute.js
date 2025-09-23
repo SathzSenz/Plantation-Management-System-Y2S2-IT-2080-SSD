@@ -1,11 +1,12 @@
 import express from 'express';
 import { Rotation } from '../../models/Crop Models/RotationModel.js';
+import { asyncHandler } from '../../middleware/errorMiddleware.js';
+import { createNotFoundError, createValidationError } from '../../utils/errors.js';
 
 const router = express.Router();
 
 //Save new record
-router.post('/', async(request, response) => {
-    try {
+router.post('/', asyncHandler(async(request, response) => {
         if (
             !request.body.season||
             !request.body.fieldName||
@@ -15,9 +16,7 @@ router.post('/', async(request, response) => {
             !request.body.yield||
             !request.body.remarks
         ) {
-            return response.status(400).send ({
-                message: 'Send all required fields',
-            });
+            throw createValidationError('Send all required fields');
         }
         const newRecord = {
             season: request.body.season,
@@ -30,46 +29,25 @@ router.post('/', async(request, response) => {
         };
 
         const result = await Rotation.create(newRecord);
-
-        return response.status(201).send(result);
-    } catch(error) {
-        console.log(error.message);
-        response.status(500).send({message:error.message});
-    }
-});
+        return response.success(result, 201);
+}));
 
 //Get all records
-router.get('/', async(request, response) => {
-    try {
+router.get('/', asyncHandler(async(request, response) => {
         const result = await Rotation.find({});
-
-        return response.status(200).json({
-            count: result.length,
-            data:result
-        })
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success({ count: result.length, data: result })
+}));
 
 //Get one record by id
-router.get('/:id', async(request, response) => {
-    try {
+router.get('/:id', asyncHandler(async(request, response) => {
         const {id} = request.params;
-
         const result = await Rotation.findById(id);
-
-        return response.status(200).json(result);
-    } catch(error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        if (!result) throw createNotFoundError('Rotation record');
+        return response.success(result);
+}));
 
 //Update record
-router.put('/:id', async(request, response) => {
-    try {
+router.put('/:id', asyncHandler(async(request, response) => {
         if (
             !request.body.season||
             !request.body.fieldName||
@@ -79,41 +57,28 @@ router.put('/:id', async(request, response) => {
             !request.body.yield||
             !request.body.remarks 
         ) {
-            return response.status(400).send({
-                mesage: 'Send all required fields'
-            });
+            throw createValidationError('Send all required fields');
         }
 
         const {id} = request.params;
 
-        const result = await Rotation.findByIdAndUpdate(id, request.body);
+        const result = await Rotation.findByIdAndUpdate(id, request.body, { new: true });
         
         if (!result) {
-            return response.status(404).json({message: 'Record not found'});
+            throw createNotFoundError('Rotation record');
         }
-
-        return response.status(200).send({message: 'Record updated successfully'});
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success({message: 'Record updated successfully', data: result});
+}));
 
 //Route to delete a Record
-router.delete('/:id', async(request, response) => {
-    try {
+router.delete('/:id', asyncHandler(async(request, response) => {
         const {id} = request.params
         const result = await Rotation.findByIdAndDelete(id);
 
         if (!result) {
-            return response.status(404).json({ message: 'Record not found'});
+            throw createNotFoundError('Rotation record');
         }
-
-        return response.status(200).send({message: 'Record deleted successfully'});
-    } catch (error) {
-        console.log(error.message);
-        response.status(500).send({message: error.message});
-    }
-});
+        return response.success({message: 'Record deleted successfully'});
+}));
 
 export default router;

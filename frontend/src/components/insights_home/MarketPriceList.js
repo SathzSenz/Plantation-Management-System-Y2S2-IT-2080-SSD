@@ -38,7 +38,7 @@ export default function MarketPriceList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('https://elemahana-backend.vercel.app/marketprice', {
+            .get('http://localhost:5555/marketprice', {
                 params: {
                     filter: selectedFilter // Pass the selected filter value(name)
                 }
@@ -290,7 +290,7 @@ export default function MarketPriceList() {
         }
         setLoadingPrediction(true);
         axios
-            .get('https://elemahana-backend.vercel.app/generate_market_prices', {
+            .get('http://localhost:5555/generate_market_prices', {
                 params: {
                     name: selectedFilter // Pass the selected filter value
                 }

@@ -45,7 +45,7 @@ const BookingList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`https://elemahana-backend.vercel.app/booking`)
+            .get(`http://localhost:5555/booking`)
             .then((response) => {
                 setOriginalRecords(response.data.data); // Set original records here
                 setBookingRecords(response.data.data); // Also set booking records here initially
@@ -147,7 +147,7 @@ const BookingList = () => {
 
     const handleDelete = (recordId) => {
         axios
-            .delete(`https://elemahana-backend.vercel.app/booking/${recordId}`)
+            .delete(`http://localhost:5555/booking/${recordId}`)
             .then(() => {
                 setBookingRecords(prevRecords => prevRecords.filter(record => record._id !== recordId));
             })

@@ -18,7 +18,7 @@ const EditRotation = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`https://elemahana-backend.vercel.app/rotation/${id}`)
+        axios.get(`http://localhost:5555/rotation/${id}`)
             .then((response) => {
                 setSeason(response.data.season);
                 setFieldName(response.data.fieldName);
@@ -49,7 +49,7 @@ const EditRotation = () => {
         };
         setLoading(true);
         axios
-            .put(`https://elemahana-backend.vercel.app/rotation/${id}`, data)
+            .put(`http://localhost:5555/rotation/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited successfully', { variant: 'success' });
