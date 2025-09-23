@@ -3,6 +3,7 @@ import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { TestRecord } from "./models/TestModel.js";
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import testRoute from "./routes/TestRoute.js";
 
 import BookingRoute from "./routes/AgroTourism Routes/BookingRoute.js";
@@ -47,6 +48,22 @@ app.use(express.json());
 
 //const Images = mongoose.model("productModel");
 
+const globalLimiter = rateLimit({
+      windowMs: 15 * 60 * 1000,  // 15 minutes
+      max: 100,
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
+
+    const bookingLimiter = rateLimit({
+      windowMs: 60 * 1000,
+      max: 10,
+      message: { error: 'Too many booking requests, please try again later.' },
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
+
+    app.use(globalLimiter);
 
 app.use(cors({
     origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000', 'https://elemahana.vercel.app'],
@@ -75,8 +92,8 @@ app.use('/machineRecord', MachineRecordRoute);
 app.use('/salary', SalaryRoute);
 app.use('/weather', WeatherAPI)
 
-app.use('/booking', BookingRoute);
-app.use('/confirmation', BookingRoute);
+app.use(['/booking', '/confirmation'], bookingLimiter, BookingRoute);
+
 app.use('/feedbacklist',FeedbackRoute);
 app.use('/feedback',FeedbackRoute);
 
@@ -108,17 +125,27 @@ app.use('/count', DiseaseCountRoute);
 // 404 for unmatched routes
 app.use(notFoundMiddleware);
 
-mongoose
-    .connect(mongoDBURL)
-    .then(() => {
-        console.log('App connected to the database');
-        app.listen(PORT, () => {
-            console.log(`App is listening to port : ${PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.log(error);
-    });
+if (process.env.NODE_ENV !== "test") {
+    // dev/prod mode → connect DB + start server
+    mongoose
+        .connect(mongoDBURL)
+        .then(() => {
+            console.log("App connected to the database");
+            app.listen(PORT, () => {
+                console.log(`🚀 App is listening on port : ${PORT}`);
+            });
+        })
+        .catch((error) => console.error(error));
+} else {
+    // test mode → connect DB only, no listen()
+    mongoose
+        .connect(mongoDBURL)
+        .then(() => console.log("App connected to the test database"))
+        .catch((error) => console.error(error));
+}
+
+export default app; // 👈 for Supertest
+
 
 // centralized error handler must be the last middleware
 app.use(errorHandler);
