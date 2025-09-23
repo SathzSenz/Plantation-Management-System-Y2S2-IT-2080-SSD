@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from 'mongoose';
 import {TaskRecord} from "../../models/EmpManagement/TaskModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
@@ -49,6 +50,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const TaskRecords = await TaskRecord.findById(id);
         if (!TaskRecords) throw createNotFoundError('Task record');
         return response.success(TaskRecords);
@@ -72,7 +77,17 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await TaskRecord.findByIdAndUpdate(id, request.body, { new: true });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { emp_id, task, assign_date, due_date, task_des, task_status } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { emp_id, task, assign_date, due_date, task_des, task_status };
+
+        const result = await TaskRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Task record');
@@ -84,6 +99,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await TaskRecord.findByIdAndDelete(id);
 

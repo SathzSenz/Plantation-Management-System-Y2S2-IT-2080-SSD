@@ -1,5 +1,6 @@
 import {MachinesRecord} from "../../models/Finance Models/MachineRecordModel.js";
 import express from "express";
+import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
@@ -40,6 +41,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const MachineRecord = await MachinesRecord.findById(id);
         if (!MachineRecord) throw createNotFoundError('Machine record');
         return response.success(MachineRecord);
@@ -59,7 +64,17 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await MachinesRecord.findByIdAndUpdate(id, request.body, { new: true });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { task_id, record_date, reading_start, reading_end, record_pay } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { task_id, record_date, reading_start, reading_end, record_pay };
+
+        const result = await MachinesRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Machine record');
@@ -70,6 +85,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route for Delete a book
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await MachinesRecord.findByIdAndDelete(id);
 

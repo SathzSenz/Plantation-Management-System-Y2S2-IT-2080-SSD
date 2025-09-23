@@ -55,6 +55,10 @@ router.get('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('ID parameter is required');
         }
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const inventoryrecord = await InventoryRecord.findById(id);
         if (!inventoryrecord) {
             throw createNotFoundError('Inventory record');
@@ -65,6 +69,10 @@ router.get('/:id', asyncHandler(async (request, response) => {
 // Update inventory record
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const {
             Eq_machine_main,
             Eq_id_main,
@@ -82,8 +90,11 @@ router.put('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('All required data must be provided');
         }
 
+        // Create update object with only allowed fields
+        const updateData = { Eq_machine_main, Eq_id_main, date_referred, date_received, price, pay_person, ref_loc, status, comment };
+
         // Find and update the inventory record
-        const updatedRecord = await InventoryRecord.findByIdAndUpdate(id, request.body, { new: true });
+        const updatedRecord = await InventoryRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!updatedRecord) {
             throw createNotFoundError('Inventory record');
@@ -94,6 +105,9 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Delete inventory record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         // Find and delete the inventory record
         const result = await InventoryRecord.findByIdAndDelete(id);
         if (!result) {

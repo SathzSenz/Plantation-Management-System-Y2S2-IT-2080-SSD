@@ -1,5 +1,6 @@
 // Import the necessary modules and models
 import express from 'express';
+import mongoose from 'mongoose';
 import Feedback from '../../models/AgroTourism Models/FeedbackModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
@@ -38,6 +39,10 @@ router.get('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         // Find the feedback document by ID in the database
         const feedback = await Feedback.findById(id);
 
@@ -55,8 +60,23 @@ router.put('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { name, email, feedback, rating } = req.body;
+
+        // Check if all required fields are provided
+        if (!name || !email || !feedback || !rating) {
+            throw createValidationError('All required fields must be provided: name, email, feedback, rating');
+        }
+
+        // Create update object with only allowed fields
+        const updateData = { name, email, feedback, rating };
+
         // Find and update the feedback document by ID in the database
-        const updatedFeedback = await Feedback.findByIdAndUpdate(id, req.body, { new: true });
+        const updatedFeedback = await Feedback.findByIdAndUpdate(id, updateData, { new: true });
 
         // If the feedback document is not found, send a 404 response
         if (!updatedFeedback) {
@@ -71,6 +91,10 @@ router.put('/:id', asyncHandler(async (req, res) => {
 router.delete('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Find and delete the feedback document by ID in the database
         const deletedFeedback = await Feedback.findByIdAndDelete(id);

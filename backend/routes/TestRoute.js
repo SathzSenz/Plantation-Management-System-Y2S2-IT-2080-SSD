@@ -1,5 +1,6 @@
 import {TestRecord} from "../models/TestModel.js";
 import express from "express";
+import mongoose from 'mongoose';
 import { asyncHandler } from "../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../utils/errors.js";
 
@@ -49,6 +50,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const testRecord = await TestRecord.findById(id);
         if (!testRecord) throw createNotFoundError('Test record');
         return response.success(testRecord);
@@ -71,7 +76,17 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await TestRecord.findByIdAndUpdate(id, request.body, { new: true });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { first_name, last_name, uemail, country, street_address, city, region, postal_code } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { first_name, last_name, uemail, country, street_address, city, region, postal_code };
+
+        const result = await TestRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Test record');
@@ -83,6 +98,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route for Delete a book
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await TestRecord.findByIdAndDelete(id);
 

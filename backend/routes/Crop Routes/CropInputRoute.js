@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { CropInputs } from '../../models/Crop Models/CropInputModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
@@ -62,6 +63,10 @@ router.get('/', asyncHandler(async (request, response) => {
 // Get one record by id
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const cropInput = await CropInputs.findById(id);
         if (!cropInput) throw createNotFoundError('Crop input');
         return response.success(cropInput);
@@ -71,13 +76,23 @@ router.get('/:id', asyncHandler(async (request, response) => {
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         // Check if unitCost is present in the request body
         if (!request.body.date || !request.body.type || !request.body.field ||
             !request.body.quantity || !request.body.remarks || !request.body.unitCost) {
             throw createValidationError('Send all required fields');
         }
 
-        const cropInput = await CropInputs.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { date, type, field, quantity, remarks, unitCost } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { date, type, field, quantity, remarks, unitCost };
+
+        const cropInput = await CropInputs.findByIdAndUpdate(id, updateData, { new: true });
         if (!cropInput) {
             throw createNotFoundError('Crop input');
         }
@@ -87,6 +102,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route to delete a record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const cropInput = await CropInputs.findByIdAndDelete(id);
         if (!cropInput) {
             throw createNotFoundError('Crop input');

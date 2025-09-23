@@ -73,6 +73,10 @@ router.get('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('ID parameter is required');
         }
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const inventoryinput = await InventoryInput.findById(id);
         if (!inventoryinput) {
             throw createNotFoundError('Inventory record');
@@ -83,6 +87,10 @@ router.get('/:id', asyncHandler(async (request, response) => {
 // Update inventory record
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const {
             type,
             record_ID,
@@ -143,6 +151,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Delete inventory record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         // Find and delete the inventory record
         const result = await InventoryInput.findByIdAndDelete(id);
         if (!result) {

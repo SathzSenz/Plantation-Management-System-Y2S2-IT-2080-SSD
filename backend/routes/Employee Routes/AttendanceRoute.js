@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from 'mongoose';
 import {AttendanceRecord} from "../../models/EmpManagement/AttendanceModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
@@ -42,6 +43,10 @@ router.get('/', asyncHandler(async (request, response) => {
 //Route for get one attendance from database by id
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const AttendanceRecords = await AttendanceRecord.findById(id);
         if (!AttendanceRecords) throw createNotFoundError('Attendance record');
         return response.success(AttendanceRecords);
@@ -62,7 +67,17 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await AttendanceRecord.findByIdAndUpdate(id, request.body, { new: true });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { e_name, e_date, att_status } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { e_name, e_date, att_status };
+
+        const result = await AttendanceRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Attendance record');
@@ -74,6 +89,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await AttendanceRecord.findByIdAndDelete(id);
 

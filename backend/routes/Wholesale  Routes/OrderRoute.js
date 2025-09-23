@@ -1,4 +1,5 @@
-import express, {request, response} from "express";
+import express from "express";
+import mongoose from 'mongoose';
 import {Orders} from '../../models/Wholesale Models/OrderModel.js'
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
@@ -48,7 +49,17 @@ router.put('/:id', asyncHandler(async (request, response) =>{
 
         const {id} = request.params;
 
-        const result = await Orders.findByIdAndUpdate(id, request.body, { new: true });
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
+        // Extract only allowed fields from request body
+        const { orderQuantity } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { orderQuantity };
+
+        const result = await Orders.findByIdAndUpdate(id, updateData, { new: true });
 
         if(!result){
             throw createNotFoundError('Order record');
@@ -59,6 +70,10 @@ router.put('/:id', asyncHandler(async (request, response) =>{
 router.get('/:id', asyncHandler(async (request, response) =>{
         const {id} =request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const orderRecords = await Orders.findById(id);
         if (!orderRecords) throw createNotFoundError('Order record');
         return response.success(orderRecords);
@@ -66,6 +81,10 @@ router.get('/:id', asyncHandler(async (request, response) =>{
 
 router.delete('/:id', asyncHandler(async(request, response) =>{
         const {id} = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await Orders.findByIdAndDelete(id);
 
