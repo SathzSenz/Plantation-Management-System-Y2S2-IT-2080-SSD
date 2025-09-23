@@ -18,7 +18,7 @@ const EditHarvest = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:5555/record/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/record/${id}`)
             .then((response) => {
                 setDate(response.data.date.split("T")[0]);
                 setCropType(response.data.cropType);
@@ -48,7 +48,7 @@ const EditHarvest = () => {
         };
         setLoading(true);
         axios
-            .put(`http://localhost:5555/record/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/record/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited successfully', { variant: 'success' });

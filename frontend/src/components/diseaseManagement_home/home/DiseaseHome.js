@@ -16,7 +16,7 @@ export default function DiseaseHome() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/diseases')
+            .get('${process.env.REACT_APP_API_BASE_URL}/diseases')
             .then((response) => {
                 setDiseaseRecords(response.data.data);
                 setLoading(false);

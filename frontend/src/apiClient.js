@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 export const api = axios.create({
-    // baseURL can be set if consistent
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'https://elemahana-backend.vercel.app',
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 function normalizeSuccessResponse(response) {

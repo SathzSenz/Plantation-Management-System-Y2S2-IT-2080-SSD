@@ -29,7 +29,7 @@ const EditInventoryRecords = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:5555/inventoryinputs/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs/${id}`)
             .then((response) => {
                 const data = response.data;
                 setFormData({
@@ -100,7 +100,7 @@ const EditInventoryRecords = () => {
         };
 
         try {
-            await axios.put(`http://localhost:5555/inventoryinputs/${id}`, updatedData);
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs/${id}`, updatedData);
             setLoading(false);
             enqueueSnackbar('Record Edited Successfully!', {
                 variant: 'success',
@@ -123,7 +123,7 @@ const EditInventoryRecords = () => {
                     method: 'Automated Entry',
                 };
 
-                await axios.post('http://localhost:5555/transactions', transactionData);
+                await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData);
             }
         } catch (error) {
             setLoading(false);

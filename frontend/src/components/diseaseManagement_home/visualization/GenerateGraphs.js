@@ -16,7 +16,7 @@ export default function GenerateGraphs() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/diseases/g?timeline=${timeLineFilter}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/diseases/g?timeline=${timeLineFilter}`)
             .then((response) => {
                 setDiseaseRecords(response.data.data);
                 setLoading(false);

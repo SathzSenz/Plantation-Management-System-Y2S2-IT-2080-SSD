@@ -25,7 +25,7 @@ const TaskForm = () => {
             task_status,
         };
         axios
-            .post('http://localhost:5555/taskRecords', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/taskRecords', data)
             .then(() => {
                 enqueueSnackbar('Record Created successfully', { variant: 'success' });
                 navigate('/employees/tasks', { state: { highlighted: true } }); // Navigate to maintenance log and highlight it

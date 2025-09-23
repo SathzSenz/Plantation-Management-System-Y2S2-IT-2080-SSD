@@ -15,7 +15,7 @@ export default function FeedbackDashboard() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get("http://localhost:5555/feedback")
+            .get(`${process.env.REACT_APP_API_BASE_URL}/feedback`)
             .then((response) => {
                 setFeedbackData(response.data.data);
                 setLoading(false);

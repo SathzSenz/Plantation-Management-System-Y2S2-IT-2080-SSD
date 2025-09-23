@@ -15,7 +15,7 @@ const InHome = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryrecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords`)
             .then((response) => {
                 setInventoryRecords(response.data.data);
                 setLoading(false);
@@ -29,7 +29,7 @@ const InHome = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryinputs`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs`)
             .then((response) => {
                 setInventoryInputs(response.data.data);
                 setLoading(false);

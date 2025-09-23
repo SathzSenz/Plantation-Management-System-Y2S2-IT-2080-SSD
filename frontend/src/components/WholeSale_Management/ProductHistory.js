@@ -28,7 +28,7 @@ const ProductHistory = () =>{
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/productRecords')
+            .get('${process.env.REACT_APP_API_BASE_URL}/productRecords')
             .then((response) =>{
                 setProductRecords(response.data.data); // Assuming response.data is an object with a 'data' property containing an array of records
                 setLoading(false);
@@ -43,7 +43,7 @@ const ProductHistory = () =>{
 
     const handleDelete = (recordId) => {
         axios
-            .delete(`http://localhost:5555/${recordId}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/${recordId}`)
             .then(() => {
                 setProductRecords(prevRecord => prevRecord.filter(record => record._id !== recordId));
             })

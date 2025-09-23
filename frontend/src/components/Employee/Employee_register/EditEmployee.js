@@ -23,7 +23,7 @@ const EditEmployee = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:5555/employeeRecords/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords/${id}`)
             .then((response) => {
 
                 setF_name(response.data.f_name);
@@ -66,7 +66,7 @@ const EditEmployee = () => {
         };
         setLoading(true);
         axios
-            .put(`http://localhost:5555/employeeRecords/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Update successfully', {variant: 'success'});

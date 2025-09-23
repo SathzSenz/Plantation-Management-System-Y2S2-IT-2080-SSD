@@ -129,7 +129,7 @@ export default function BookingForm() {
                     totalPayment,
                 };
                 // Post booking data
-                await axios.post('http://localhost:5555/booking', bookingData);
+                await axios.post('${process.env.REACT_APP_API_BASE_URL}/booking', bookingData);
                 // <-- Issue here, formData should be bookingData
                 // Reset form data
                 setFormData({
@@ -155,7 +155,7 @@ export default function BookingForm() {
                 };
 
                 // Post the transaction data
-                await axios.post('http://localhost:5555/transactions', transactionData);
+                await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData);
 
 
                 // Redirect to a confirmation page or any other page after successful submission

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { GiSandsOfTime } from 'react-icons/gi';
 
-const BASE_URL = 'https://elemahana-backend.vercel.app';
+const BASE_URL = process.env.REACT_APP_PRODUCTION_API_URL;
 
 const UpcomingHarvestTile = ({ setHarvestTileBg }) => {
     const [loading, setLoading] = useState(true);

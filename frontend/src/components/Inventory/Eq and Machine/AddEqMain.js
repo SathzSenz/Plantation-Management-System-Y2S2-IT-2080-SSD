@@ -22,7 +22,7 @@ const AddEqMain = () => {
 
     useEffect(() => {
         axios
-            .get('http://localhost:5555/inventoryinputs')
+            .get('${process.env.REACT_APP_API_BASE_URL}/inventoryinputs')
             .then((response) => {
                 const filteredEquipments = response.data.data
                     .filter((item) => item.type === 'Equipments')
@@ -97,7 +97,7 @@ const AddEqMain = () => {
                 method: 'Automated Entry',
             };
 
-            await axios.post('http://localhost:5555/transactions', transactionData);
+            await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData);
         }
 
         const data = {
@@ -113,7 +113,7 @@ const AddEqMain = () => {
         };
 
         try {
-            await axios.post('http://localhost:5555/inventoryrecords', data);
+            await axios.post('${process.env.REACT_APP_API_BASE_URL}/inventoryrecords', data);
             enqueueSnackbar('Record Created Successfully!', { variant: 'success' });
             navigate('/inventory/maintenancelog', { state: { highlighted: true } });
         } catch (error) {

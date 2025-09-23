@@ -46,7 +46,7 @@ const PlantingList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/cropinput`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/cropinput`)
             .then((response) => {
                 const formattedRecords = response.data.data
                     .filter(record => record.type === "Planting")
@@ -84,7 +84,7 @@ const PlantingList = () => {
     const confirmDelete = () => {
         if (recordToDelete) {
             axios
-                .delete(`http://localhost:5555/cropinput/${recordToDelete}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/cropinput/${recordToDelete}`)
                 .then(() => {
                     setPlantingRecords(prevRecords =>
                         prevRecords.filter(record => record._id !== recordToDelete)

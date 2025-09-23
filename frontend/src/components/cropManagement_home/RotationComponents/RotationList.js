@@ -40,7 +40,7 @@ const RotationList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/rotation`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/rotation`)
             .then((response) => {
                 setRotationRecords(response.data.data);
                 setLoading(false);
@@ -71,7 +71,7 @@ const RotationList = () => {
     const confirmDelete = () => {
         if (recordToDelete) {
             axios
-                .delete(`http://localhost:5555/rotation/${recordToDelete}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/rotation/${recordToDelete}`)
                 .then(() => {
                     setRotationRecords(prevRecords =>
                         prevRecords.filter(record => record._id !== recordToDelete)
@@ -88,7 +88,7 @@ const RotationList = () => {
 
     const confirmDeleteAction = () => {
         axios
-            .delete(`http://localhost:5555/rotation/${recordToDelete}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/rotation/${recordToDelete}`)
             .then(() => {
                 setRotationRecords(prevRecords => prevRecords.filter(record => record._id !== recordToDelete));
             })

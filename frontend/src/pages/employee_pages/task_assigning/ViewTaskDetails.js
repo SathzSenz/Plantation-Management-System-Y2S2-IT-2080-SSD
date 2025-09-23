@@ -27,7 +27,7 @@ export default function ViewTaskDetails() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/taskRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/taskRecords/${id}`)
             .then((response) => {
                 setTaskRecord(response.data);
                 setLoading(false);

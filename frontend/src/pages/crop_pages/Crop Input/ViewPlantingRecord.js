@@ -21,7 +21,7 @@ export default function ViewPlantingRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/cropinput/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/cropinput/${id}`)
     .then((response) => {
             setRecord(response.data);
             setLoading(false);

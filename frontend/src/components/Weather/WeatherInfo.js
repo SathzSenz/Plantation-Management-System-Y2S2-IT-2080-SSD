@@ -8,13 +8,13 @@ import {LeftOutlined, RightOutlined} from "@ant-design/icons";
 export default function WeatherComponent() {
     const [weatherData, setWeatherData] = useState(null);
     const [selectedDateIndex, setSelectedDateIndex] = useState(0);
-    const apiKey = '1c3aceb8ef0f8038b5a8f22944913ef0';
+    const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY;
     const availableDates = weatherData ? weatherData.list.map(forecast => new Date(forecast.dt * 1000)) : [];
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const url = `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=7.851732&lon=80.098774&appid=${apiKey}&units=metric`;
+                const url = `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=${process.env.REACT_APP_DEFAULT_LAT}&lon=${process.env.REACT_APP_DEFAULT_LON}&appid=${apiKey}&units=metric`;
                 const { data } = await axios.get(url);
                 setWeatherData(data);
             } catch (error) {

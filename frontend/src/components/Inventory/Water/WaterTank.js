@@ -44,7 +44,7 @@ function WaterTank() {
             water_des
         };
         axios
-            .post('http://localhost:5555/waterRecords', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/waterRecords', data)
             .then((response) => {
                 enqueueSnackbar('Record Created successfully', { variant: 'success' });
                 setWaterRecord(prevRecords => [...prevRecords, response.data]);
@@ -93,7 +93,7 @@ function WaterTank() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/waterRecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/waterRecords`)
             .then((response) => {
                 setWaterRecord(response.data.data);
                 setLoading(false);
@@ -109,7 +109,7 @@ function WaterTank() {
 
     const handleDelete = (recordId) => {
         axios
-            .delete(`http://localhost:5555/waterRecords/${recordId}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/waterRecords/${recordId}`)
             .then(() => {
                 setWaterRecord(prevRecords => prevRecords.filter(record => record._id !== recordId));
                 enqueueSnackbar('Record Deleted Successfully!', {

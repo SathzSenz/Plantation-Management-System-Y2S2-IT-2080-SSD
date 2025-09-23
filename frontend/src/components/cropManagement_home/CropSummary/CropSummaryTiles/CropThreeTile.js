@@ -29,7 +29,7 @@ export default function CropThreeTile() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/cropinput')
+            .get('${process.env.REACT_APP_API_BASE_URL}/cropinput')
             .then((response) => {
                 const plantingRecordsData = response.data.data;
                 const filteredPlantingRecords = plantingRecordsData.filter(record => record.type === 'Planting' && record.cropType === 'Apple Guava');
@@ -69,7 +69,7 @@ export default function CropThreeTile() {
             });
 
         axios
-            .get('http://localhost:5555/marketprice')
+            .get('${process.env.REACT_APP_API_BASE_URL}/marketprice')
             .then((response) => {
                 const marketPriceData = response.data.data;
                 const closestRecord = findClosestRecord(marketPriceData);

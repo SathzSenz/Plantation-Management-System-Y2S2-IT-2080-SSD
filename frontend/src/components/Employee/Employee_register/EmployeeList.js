@@ -35,7 +35,7 @@ const EmployeeList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/employeeRecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords`)
             .then((response) => {
                 setRegistrationRecords(response.data.data);
                 setLoading(false);
@@ -67,7 +67,7 @@ const EmployeeList = () => {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`http://localhost:5555/employeeRecords/${id}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords/${id}`)
                 .then(() => {
                     setRegistrationRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     setLoading(false);

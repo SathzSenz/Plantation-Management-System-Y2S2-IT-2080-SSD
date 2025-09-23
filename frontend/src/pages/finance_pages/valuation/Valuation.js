@@ -52,7 +52,7 @@ export default function Valuation() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/valuation')
+            .get('${process.env.REACT_APP_API_BASE_URL}/valuation')
             .then((response) => {
                 setValuationRecords(response.data.data);
                 setLoading(false);
@@ -71,7 +71,7 @@ export default function Valuation() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`http://localhost:5555/valuation/${id}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/valuation/${id}`)
                 .then(() => {
                     setValuationRecords(prevRecords => prevRecords.filter(record => record._id !== id));
                     message.success('Valuation record has been successfully deleted.');

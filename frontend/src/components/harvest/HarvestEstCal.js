@@ -14,7 +14,7 @@ function HarvestCalculator() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/record')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/record`)
             .then((response) => {
                 setHarvestRecords(response.data.data);
                 setLoading(false);

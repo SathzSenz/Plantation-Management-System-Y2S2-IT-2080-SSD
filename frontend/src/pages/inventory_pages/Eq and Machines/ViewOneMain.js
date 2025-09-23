@@ -24,7 +24,7 @@ export default function ViewOneMain() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryrecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords/${id}`)
             .then((response) => {
                 setRecord(response.data);
                 setLoading(false);

@@ -31,7 +31,7 @@ export default function RecordRotation() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5555/rotation', formData);
+            const response = await axios.post('${process.env.REACT_APP_API_BASE_URL}/rotation', formData);
             console.log(response.data);
             setFormData({
                 season: '',

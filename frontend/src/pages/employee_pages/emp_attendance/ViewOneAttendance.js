@@ -27,7 +27,7 @@ export default function ViewOneAttendance() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/attendanceRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/attendanceRecords/${id}`)
             .then((response) => {
                 setAttendanceRecord(response.data);
                 setLoading(false);

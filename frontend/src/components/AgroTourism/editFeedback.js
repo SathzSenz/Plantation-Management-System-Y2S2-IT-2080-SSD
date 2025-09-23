@@ -13,7 +13,7 @@ const EditFeedback = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`http://localhost:5555/feedback/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/feedback/${id}`)
             .then((response) => {
                 const { name, email, feedback, rating } = response.data;
                 setName(name);
@@ -30,7 +30,7 @@ const EditFeedback = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:5555/feedback/${id}`, {
+            const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/feedback/${id}`, {
                 name,
                 email,
                 feedback,

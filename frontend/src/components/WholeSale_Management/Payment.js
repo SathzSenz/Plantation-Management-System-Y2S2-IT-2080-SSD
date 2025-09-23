@@ -50,7 +50,7 @@ const Payment = () => {
             setTimeout(() => {
                 // Post order data
                 axios
-                    .post('http://localhost:5555/orderRecords', orderData)
+                    .post('${process.env.REACT_APP_API_BASE_URL}/orderRecords', orderData)
                     .then(() => {
                         enqueueSnackbar('Record Created Successfully', { variant: 'success' });
                         // Navigate to the confirmation page

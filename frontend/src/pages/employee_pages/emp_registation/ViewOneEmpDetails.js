@@ -27,7 +27,7 @@ export default function ViewOneEmpDetails() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/employeeRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords/${id}`)
             .then((response) => {
                 setRegistrationRecord(response.data);
                 setLoading(false);

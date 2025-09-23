@@ -24,7 +24,7 @@ export default function ViewOneRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryinputs/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs/${id}`)
             .then((response) => {
                 setRecord(response.data);
                 setLoading(false);

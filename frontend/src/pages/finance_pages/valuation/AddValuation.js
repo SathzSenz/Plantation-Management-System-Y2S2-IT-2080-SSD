@@ -53,7 +53,7 @@ function AddNewValuation() {
         };
         setLoading(true);
         axios
-            .post('http://localhost:5555/valuation', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/valuation', data)
             .then(() => {
                 setLoading(false);
                 message.success('Valuation record has successfully saved.');
@@ -87,7 +87,7 @@ function AddNewValuation() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('http://localhost:5555/transactions', transactionData)
+            .post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

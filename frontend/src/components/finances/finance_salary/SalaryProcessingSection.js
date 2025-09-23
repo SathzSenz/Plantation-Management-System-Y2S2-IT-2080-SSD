@@ -42,7 +42,7 @@ export default function SalaryProcessingSection() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/employeeRecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords`)
             .then((response) => {
                 setRegistrationRecords(response.data.data); // Assuming response.data is an object with a 'data' property containing an array of records
                 setLoading(false);
@@ -75,7 +75,7 @@ export default function SalaryProcessingSection() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/employeeRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/employeeRecords/${id}`)
             .then((response) => {
 
                 // Conditionally set EPF/ETF based on employee type
@@ -96,7 +96,7 @@ export default function SalaryProcessingSection() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/attendanceRecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/attendanceRecords`)
             .then((response) => {
                 setAttendanceRecords(response.data.data);
                 setLoading(false);
@@ -248,7 +248,7 @@ export default function SalaryProcessingSection() {
         const netSalary = totalSalary - epfEtfDeduction;
         setLoading(true);
         axios
-            .post('http://localhost:5555/salary', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/salary', data)
             .then(() => {
                 setLoading(false);
                 message.success('Salary record has successfully saved.');
@@ -282,7 +282,7 @@ export default function SalaryProcessingSection() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('http://localhost:5555/transactions', transactionData)
+            .post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

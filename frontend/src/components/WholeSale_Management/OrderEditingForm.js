@@ -19,7 +19,7 @@ const OrderEditingForm = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/orderRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/orderRecords/${id}`)
             .then((response) => {
                 setProduct(response.data);
                 setOrderQuantity(response.data.orderQuantity);
@@ -68,7 +68,7 @@ const OrderEditingForm = () => {
         };
         setLoading(true);
         axios
-            .put(`http://localhost:5555/orderRecords/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/orderRecords/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited successfully', { variant: 'success' });

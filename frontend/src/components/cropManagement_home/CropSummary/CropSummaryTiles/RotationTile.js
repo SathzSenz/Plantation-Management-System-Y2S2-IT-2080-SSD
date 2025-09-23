@@ -12,7 +12,7 @@ export default function RotationTile() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/cropinput')
+            .get('${process.env.REACT_APP_API_BASE_URL}/cropinput')
             .then((response) => {
                 const plantingRecordsData = response.data.data;
                 const filteredPlantingRecords = plantingRecordsData.filter(record => record.type === 'Planting' && record.cropType !== 'Coconut');
@@ -28,7 +28,7 @@ export default function RotationTile() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/rotation')
+            .get('${process.env.REACT_APP_API_BASE_URL}/rotation')
             .then((response) => {
                 const rotationRecordsData = response.data.data;
                 const filteredRotationRecords = rotationRecordsData.filter(record => record.season === '1 Season Ago' || record.season === '2 Seasons Ago');

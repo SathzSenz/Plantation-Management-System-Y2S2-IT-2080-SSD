@@ -12,7 +12,7 @@ function Emphome() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get('http://localhost:5555/employeeRecords')
+        axios.get('${process.env.REACT_APP_API_BASE_URL}/employeeRecords')
             .then(response => {
                 setEmployeeRecords(response.data.data)
                 setLoading(false);
@@ -25,7 +25,7 @@ function Emphome() {
 
     useEffect(() => {
         setLoading(true);
-        axios.get('http://localhost:5555/taskRecords')
+        axios.get('${process.env.REACT_APP_API_BASE_URL}/taskRecords')
             .then(response => {
                 setTaskRecords(response.data.data);
                 setCompletedTasks(response.data.data.filter(task => task.task_status === "completed").length);

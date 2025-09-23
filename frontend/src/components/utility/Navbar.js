@@ -43,7 +43,7 @@ export default function Navbar() {
     const fetchData = async () => {
         try {
             const accessToken = await getToken();
-            const res = await safeFetch(`https://elemahana.kinde.com/api`, {
+            const res = await safeFetch(`${process.env.REACT_APP_KINDE_DOMAIN}/api`, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }

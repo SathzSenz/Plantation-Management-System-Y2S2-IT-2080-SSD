@@ -48,7 +48,7 @@ export default function AddInventoryRecords() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5555/inventoryinputs", formData);
+            await axios.post("${process.env.REACT_APP_API_BASE_URL}/inventoryinputs", formData);
 
             enqueueSnackbar('Record Created Successfully!', {
                 variant: 'success',
@@ -87,7 +87,7 @@ export default function AddInventoryRecords() {
                     method: 'Automated Entry',
                 };
 
-                await axios.post('http://localhost:5555/transactions', transactionData);
+                await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData);
             }
 
         } catch (error) {

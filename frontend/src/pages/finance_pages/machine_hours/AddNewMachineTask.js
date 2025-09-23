@@ -51,7 +51,7 @@ function AddNewMachineTask() {
         };
         setLoading(true);
         axios
-            .post('http://localhost:5555/machines', machineData)
+            .post('${process.env.REACT_APP_API_BASE_URL}/machines', machineData)
             .then(() => {
                 setLoading(false);
                 message.success('Machine task has successfully saved.');
@@ -72,7 +72,7 @@ function AddNewMachineTask() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('http://localhost:5555/transactions', transactionData)
+            .post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');

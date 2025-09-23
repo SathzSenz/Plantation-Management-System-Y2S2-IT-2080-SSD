@@ -23,7 +23,7 @@ const EditEqMain = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:5555/inventoryrecords/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords/${id}`)
             .then((response) => {
                 setSelectedEquipment(response.data.Eq_machine_main);
                 setEq_id_main(response.data.Eq_id_main);
@@ -42,7 +42,7 @@ const EditEqMain = () => {
         });
 
         // Fetch equipment names and IDs from inventory records
-        axios.get('http://localhost:5555/inventoryinputs')
+        axios.get('${process.env.REACT_APP_API_BASE_URL}/inventoryinputs')
             .then((response) => {
                 const filteredEquipments = response.data.data
                     .filter((item) => item.type === 'Equipments')
@@ -106,7 +106,7 @@ const EditEqMain = () => {
             };
 
             try {
-                await axios.post('http://localhost:5555/transactions', transactionData);
+                await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData);
             } catch (error) {
                 console.error('Error saving transaction:', error);
             }
@@ -126,7 +126,7 @@ const EditEqMain = () => {
 
         setLoading(true);
         axios
-            .put(`http://localhost:5555/inventoryrecords/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited Successfully!', {

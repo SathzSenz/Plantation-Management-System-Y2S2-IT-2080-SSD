@@ -21,7 +21,7 @@ const InventoryRecordList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryinputs`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs`)
             .then((response) => {
                 setInventoryInputs(response.data.data);
                 setLoading(false);
@@ -40,7 +40,7 @@ const InventoryRecordList = () => {
     const handleConfirmDelete = () => {
         const recordId = selectedRecordId;
         axios
-            .delete(`http://localhost:5555/inventoryinputs/${recordId}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs/${recordId}`)
             .then(() => {
                 setInventoryInputs((prevInputs) => prevInputs.filter((input) => input._id !== recordId));
                 setShowConfirmation(false);

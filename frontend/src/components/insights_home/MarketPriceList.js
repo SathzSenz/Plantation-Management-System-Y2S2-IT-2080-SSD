@@ -38,7 +38,7 @@ export default function MarketPriceList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/marketprice', {
+            .get('${process.env.REACT_APP_API_BASE_URL}/marketprice', {
                 params: {
                     filter: selectedFilter // Pass the selected filter value(name)
                 }
@@ -290,7 +290,7 @@ export default function MarketPriceList() {
         }
         setLoadingPrediction(true);
         axios
-            .get('http://localhost:5555/generate_market_prices', {
+            .get('${process.env.REACT_APP_API_BASE_URL}/generate_market_prices', {
                 params: {
                     name: selectedFilter // Pass the selected filter value
                 }

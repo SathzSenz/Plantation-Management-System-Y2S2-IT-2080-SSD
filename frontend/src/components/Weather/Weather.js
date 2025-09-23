@@ -7,7 +7,7 @@ function Weather() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const { data } = await api.get('http://localhost:5555/weather?lat=40.7128&lon=-74.0060');
+                const { data } = await api.get(`${process.env.REACT_APP_API_BASE_URL}/weather?lat=${process.env.REACT_APP_DEFAULT_LAT}&lon=${process.env.REACT_APP_DEFAULT_LON}`);
                 console.log(data); // To understand the structure
 
                 // Assuming data contains an array named 'timelines' and we are interested in the first item

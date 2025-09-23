@@ -17,7 +17,7 @@ const ProductEditingForm = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/productRecords/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/productRecords/${id}`)
             .then((response) => {
                 setProductID(response.data.productID);
                 setProductName(response.data.productName);
@@ -43,7 +43,7 @@ const ProductEditingForm = () => {
         };
         setLoading(true);
         axios
-            .put(`http://localhost:5555/productRecords/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/productRecords/${id}`, data)
             .then(() => {
                 setLoading(false);
                 enqueueSnackbar('Record Edited successfully', { variant: 'success' });

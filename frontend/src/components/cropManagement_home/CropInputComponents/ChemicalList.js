@@ -37,7 +37,7 @@ const ChemicalList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/cropinput`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/cropinput`)
             .then((response) => {
                 const formattedRecords = response.data.data
                     .filter(record => record.type === "Agrochemical")
@@ -62,7 +62,7 @@ const ChemicalList = () => {
     const confirmDelete = () => {
         if (recordToDelete) {
             axios
-                .delete(`http://localhost:5555/cropinput/${recordToDelete}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/cropinput/${recordToDelete}`)
                 .then(() => {
                     setChemicalRecords(prevRecords =>
                         prevRecords.filter(record => record._id !== recordToDelete)
@@ -80,7 +80,7 @@ const ChemicalList = () => {
 
     const confirmDeleteAction = () => {
         axios
-            .delete(`http://localhost:5555/cropinput/${recordToDelete}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/cropinput/${recordToDelete}`)
             .then(() => {
                 setChemicalRecords(prevRecords =>
                     prevRecords.filter(record => record._id !== recordToDelete)

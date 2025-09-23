@@ -49,7 +49,7 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://elemahana.vercel.app'],
+    origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000', 'https://elemahana.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
 }));

@@ -25,7 +25,7 @@ export default function ViewMachineRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/machines/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/machines/${id}`)
             .then((response) => {
                 setMachineRecord(response.data);
                 setLoading(false);
@@ -39,7 +39,7 @@ export default function ViewMachineRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/machineRecord`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/machineRecord`)
             .then((response) => {
                 setMachineRecordDetails(response.data);
                 setLoading(false);

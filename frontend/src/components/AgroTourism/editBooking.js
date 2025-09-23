@@ -18,7 +18,7 @@ const EditBooking = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:5555/booking/${id}`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/booking/${id}`)
             .then((response) => {
                 const { name, telNo, nicNo, email, selectedPackage, numberOfDays,numberOfPeople } = response.data;
                 setFullName(name);
@@ -49,7 +49,7 @@ const EditBooking = () => {
         const data = { name, telNo, nicNo, email, selectedPackage, numberOfDays, numberOfPeople };
         setLoading(true);
         try {
-            await axios.put(`http://localhost:5555/booking/${id}`, data);
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/booking/${id}`, data);
             console.log("Form submitted successfully");
             setLoading(false);
             enqueueSnackbar('Record Edited successfully', { variant: 'success', anchorOrigin: { vertical: 'top', horizontal: 'center' } });

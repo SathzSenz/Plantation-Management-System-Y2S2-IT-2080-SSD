@@ -37,7 +37,7 @@ export default function TransactionsList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/transactions')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/transactions`)
             .then((response) => {
                 setTransactionsRecords(response.data.data);
                 setLoading(false);
@@ -53,7 +53,7 @@ export default function TransactionsList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`http://localhost:5555/transactions/${id}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/transactions/${id}`)
                 .then(() => {
                     setTransactionsRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     message.success('Transaction record has successfully deleted.');
@@ -110,7 +110,7 @@ export default function TransactionsList() {
     }, []);
 
     const fetchTransactions = () => {
-        axios.get('http://localhost:5555/transactions')
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/transactions`)
             .then(response => {
                 setTransactions(response.data.data);
             })

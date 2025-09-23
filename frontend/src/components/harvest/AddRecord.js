@@ -29,7 +29,7 @@ export default function AddRecord() {
             };
         setLoading(true);
         axios
-            .post('http://localhost:5555/record', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/record', data)
             .then(() => {
                 setLoading(false);
                 navigate('/harvest/harvestRecords');

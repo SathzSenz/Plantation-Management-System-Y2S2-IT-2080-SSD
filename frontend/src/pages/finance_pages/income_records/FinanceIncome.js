@@ -15,7 +15,7 @@ export default function FinanceIncome() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/financeincome')
+            .get('${process.env.REACT_APP_API_BASE_URL}/financeincome')
             .then((response) => {
                 setTestRecords(response.data.data);
                 setLoading(false);

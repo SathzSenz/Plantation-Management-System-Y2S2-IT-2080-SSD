@@ -17,7 +17,7 @@ const FeedbackForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await safeFetch("http://localhost:5555/feedback", {
+            const response = await safeFetch(`${process.env.REACT_APP_API_BASE_URL}/feedback`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

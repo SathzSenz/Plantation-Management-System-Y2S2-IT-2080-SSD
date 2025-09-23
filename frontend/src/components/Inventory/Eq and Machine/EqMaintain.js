@@ -19,7 +19,7 @@ const EqMaintain = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryrecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords`)
             .then((response) => {
                 setInventoryRecords(response.data.data);
                 setLoading(false);
@@ -46,7 +46,7 @@ const EqMaintain = () => {
     const handleConfirmDelete = () => {
         const recordId = selectedRecordId;
         axios
-            .delete(`http://localhost:5555/inventoryrecords/${recordId}`)
+            .delete(`${process.env.REACT_APP_API_BASE_URL}/inventoryrecords/${recordId}`)
             .then(() => {
                 setInventoryRecords(prevRecords => prevRecords.filter(record => record._id !== recordId));
                 setShowConfirmation(false);

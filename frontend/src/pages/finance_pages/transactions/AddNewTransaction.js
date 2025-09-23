@@ -64,7 +64,7 @@ function AddNewTransaction() {
 
         setLoading(true);
         try {
-            await axios.post('http://localhost:5555/transactions', data);
+            await axios.post('${process.env.REACT_APP_API_BASE_URL}/transactions', data);
             setLoading(false);
             message.success('Transaction record has successfully saved.');
             navigate('/finances/transactions');

@@ -36,7 +36,7 @@ export default function PastSalaryList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/salary')
+            .get('${process.env.REACT_APP_API_BASE_URL}/salary')
             .then((response) => {
                 setSalaryRecords(response.data.data);
                 setLoading(false);
@@ -52,7 +52,7 @@ export default function PastSalaryList() {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`http://localhost:5555/salary/${id}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/salary/${id}`)
                 .then(() => {
                     setSalaryRecords((prevRecords) => prevRecords.filter((record) => record._id !== id));
                     message.success('Salary record successfully deleted.');

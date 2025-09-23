@@ -25,7 +25,7 @@ const ProductAddingForm = () => {
         };
 
         axios
-            .post('http://localhost:5555/productRecords', data)
+            .post('${process.env.REACT_APP_API_BASE_URL}/productRecords', data)
             .then(() => {
                 enqueueSnackbar('Record Created Successfully', { variant: 'success' });
                 navigate('/wholesaleDashboard', { state: { highlighted: true } });

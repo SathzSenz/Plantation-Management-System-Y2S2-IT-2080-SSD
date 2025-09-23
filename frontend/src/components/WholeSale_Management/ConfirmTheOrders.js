@@ -15,7 +15,7 @@ const ConfirmTheOrders = () =>{
     useEffect(() => {
         setLoading(true);
         axios
-            .get('http://localhost:5555/orderRecords')
+            .get('${process.env.REACT_APP_API_BASE_URL}/orderRecords')
             .then((response) =>{
                 setOrderRecords(response.data.data); // Assuming response.data is an object with a 'data' property containing an array of records
                 setLoading(false);
@@ -28,7 +28,7 @@ const ConfirmTheOrders = () =>{
 
     const confirmOrder = async (record) => {
         try {
-            const response = await axios.put(`http://localhost:5555/orderRecords/${record._id}`, {
+            const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/orderRecords/${record._id}`, {
                 orderStatus: 'confirmed',
                 orderQuantity: record.orderQuantity // include all required fields
             });

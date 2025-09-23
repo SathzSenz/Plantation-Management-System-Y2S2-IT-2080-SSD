@@ -7,7 +7,7 @@ import { createValidationError } from '../../utils/errors.js';
 const router = express.Router();
 
 // Your Tomorrow.io API key - ensure this is kept secure and not exposed to the client
-const apiKey = '76a2b7c90e2e2304d1ff1ac5c00c4cef';
+const apiKey = process.env.OPENWEATHER_API_KEY;
 
 router.get('/', asyncHandler(async (req, res) => {
     const lat = '7.851732';

@@ -26,7 +26,7 @@ function EditMachineRecord() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/machines/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/machines/${id}`)
             .then((response) => {
                 setStartDate(response.data.start_date);
                 setName(response.data.name);
@@ -71,7 +71,7 @@ function EditMachineRecord() {
         };
         setLoading(true);
         axios
-            .put(`http://localhost:5555/machines/${id}`, data)
+            .put(`${process.env.REACT_APP_API_BASE_URL}/machines/${id}`, data)
             .then(() => {
                 setLoading(false);
                 message.success('Machine record updated successfully');

@@ -24,7 +24,7 @@ export default function ViewValuationDetails() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/valuation/${id}`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/valuation/${id}`)
             .then((response) => {
                 setValuationRecord(response.data);
                 setLoading(false);

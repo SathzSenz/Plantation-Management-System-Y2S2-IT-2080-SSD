@@ -17,7 +17,7 @@ const AttendanceList = () => {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/attendanceRecords`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/attendanceRecords`)
             .then((response) => {
                 setAttendanceRecords(response.data.data);
                 setLoading(false);
@@ -33,7 +33,7 @@ const AttendanceList = () => {
         if (confirmDelete) {
             setLoading(true);
             axios
-                .delete(`http://localhost:5555/attendanceRecords/${recordId}`)
+                .delete(`${process.env.REACT_APP_API_BASE_URL}/attendanceRecords/${recordId}`)
                 .then(() => {
                     setAttendanceRecords(prevRecords => prevRecords.filter(record => record._id !== recordId));
                     setLoading(false);

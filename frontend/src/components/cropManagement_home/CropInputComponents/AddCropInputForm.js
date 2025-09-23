@@ -35,7 +35,7 @@ export default function AddCropInputForm() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`http://localhost:5555/inventoryinputs`)
+            .get(`${process.env.REACT_APP_API_BASE_URL}/inventoryinputs`)
             .then((response) => {
                 const inventoryInputsData = response.data.data;
                 const cropTypesWithQuantity = inventoryInputsData
@@ -124,7 +124,7 @@ export default function AddCropInputForm() {
 
         try {
             const response = await axios.post(
-                "http://localhost:5555/cropinput",
+                "${process.env.REACT_APP_API_BASE_URL}/cropinput",
                 formData
             );
             console.log(response.data);
