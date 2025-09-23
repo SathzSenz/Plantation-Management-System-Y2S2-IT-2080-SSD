@@ -36,7 +36,7 @@ export default function PastSalaryList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('${process.env.REACT_APP_API_BASE_URL}/salary')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/salary`)
             .then((response) => {
                 setSalaryRecords(response.data.data);
                 setLoading(false);

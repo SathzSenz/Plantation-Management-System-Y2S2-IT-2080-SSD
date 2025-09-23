@@ -11,7 +11,7 @@ export default function ProfitGraph() {
     const svgRef = useRef();
 
     useEffect(() => {
-        axios.get("${process.env.REACT_APP_API_BASE_URL}/transactions")
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/transactions`)
             .then((response) => {
                 const records = response.data.data;
                 // Calculate profit for each period

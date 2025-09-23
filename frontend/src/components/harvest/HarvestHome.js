@@ -10,7 +10,7 @@ function LastMonthHarvestRecords() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('${process.env.REACT_APP_API_BASE_URL}/record')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/record`)
             .then((response) => {
                 const currentDate = new Date();
                 const lastMonth = currentDate.getMonth() === 0 ? 11 : currentDate.getMonth() - 1; // Adjusting for January

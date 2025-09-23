@@ -21,24 +21,11 @@ function classNames(...classes) {
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { login, register, onRedirectCallback, logout, user, isAuthenticated, isLoading, getToken } = useKindeAuth();
+    const { login, register, logout, user, isAuthenticated, isLoading, getToken } = useKindeAuth();
     const location = useLocation();
     const {getPermission, getPermissions} = useKindeAuth();
 
-
-    useEffect(() => {
-        const handleRedirectCallback = async () => {
-            try {
-                const { user, app_state } = await onRedirectCallback();
-                console.log({ user, app_state });
-                // Additional handling of user and app_state if needed
-            } catch (error) {
-                console.error('Error handling redirect callback:', error);
-            }
-        };
-
-        handleRedirectCallback();
-    }, [onRedirectCallback]);
+    // Kinde React SDK handles redirects via provider; no manual callback needed here
 
     const fetchData = async () => {
         try {

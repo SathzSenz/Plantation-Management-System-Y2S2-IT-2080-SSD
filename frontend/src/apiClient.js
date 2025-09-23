@@ -7,6 +7,20 @@ export const api = axios.create({
     },
     withCredentials: true,
 });
+
+// Set defaults for modules that import axios directly
+axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL || 'https://elemahana-backend.vercel.app';
+axios.defaults.withCredentials = true;
+
+function normalizeRequestUrl(url) {
+    if (!url) return url;
+    const base = process.env.REACT_APP_API_BASE_URL || '';
+    const literal = '${process.env.REACT_APP_API_BASE_URL}';
+    if (typeof url === 'string' && url.includes(literal)) {
+        return url.replace(literal, base);
+    }
+    return url;
+}
 // CSRF token cache
 let csrfToken = null;
 
@@ -27,6 +41,8 @@ async function ensureCsrfToken() {
 
 // Attach CSRF token for unsafe methods
 api.interceptors.request.use(async (config) => {
+    // Fix literal, un-evaluated env placeholders if present
+    config.url = normalizeRequestUrl(config.url);
     const method = (config.method || 'get').toLowerCase();
     if (['post', 'put', 'patch', 'delete'].includes(method)) {
         const token = await ensureCsrfToken();
@@ -36,6 +52,12 @@ api.interceptors.request.use(async (config) => {
         }
     }
     config.withCredentials = true;
+    return config;
+});
+
+// Apply same URL normalization to the global axios instance
+axios.interceptors.request.use((config) => {
+    config.url = normalizeRequestUrl(config.url);
     return config;
 });
 

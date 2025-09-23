@@ -66,7 +66,7 @@ export default function SideBar() {
         const lastWeek = getWeekStartEnd(new Date(today.setDate(today.getDate() - 7)), 1);
 
         setLoading(true);
-        axios.get('${process.env.REACT_APP_API_BASE_URL}/transactions')
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/transactions`)
             .then((response) => {
                 const records = response.data.data;
 

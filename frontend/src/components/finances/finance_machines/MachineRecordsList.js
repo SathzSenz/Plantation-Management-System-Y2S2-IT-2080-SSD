@@ -46,7 +46,7 @@ export default function MachineRecordsList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('${process.env.REACT_APP_API_BASE_URL}/machines')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/machines`)
             .then((response) => {
                 setMachineRecords(response.data.data);
                 setLoading(false);
@@ -60,7 +60,7 @@ export default function MachineRecordsList() {
     useEffect(() => {
         setLoading(true);
         axios
-            .get('${process.env.REACT_APP_API_BASE_URL}/machineRecord')
+            .get(`${process.env.REACT_APP_API_BASE_URL}/machineRecord`)
             .then((response) => {
                 setMachineRecordDetails(response.data.data);
                 setLoading(false);
@@ -180,7 +180,7 @@ export default function MachineRecordsList() {
         try {
             // Make POST request to the API endpoint
             const response = await
-                axios.post('${process.env.REACT_APP_API_BASE_URL}/machineRecord', payload);
+                axios.post(`${process.env.REACT_APP_API_BASE_URL}/machineRecord`, payload);
 
             // Handle success response
             console.log('Record added successfully:', response.data);
@@ -221,7 +221,7 @@ export default function MachineRecordsList() {
     const handleSaveTransactionRecord = (transactionData) => {
         setLoading(true);
         axios
-            .post('${process.env.REACT_APP_API_BASE_URL}/transactions', transactionData)
+            .post(`${process.env.REACT_APP_API_BASE_URL}/transactions`, transactionData)
             .then(() => {
                 setLoading(false);
                 message.success('Transaction record has automatically saved.');
