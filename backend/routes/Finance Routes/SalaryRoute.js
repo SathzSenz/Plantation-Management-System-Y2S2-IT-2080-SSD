@@ -111,7 +111,13 @@ router.put('/:id', async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await SalariesRecord.findByIdAndUpdate(id, request.body);
+        // Extract only allowed fields from request body
+        const { payment_date, emp_name, salary_start_date, salary_end_date, nic, type, basic_days, basic_rate, bonus_salary, ot_hours, ot_rate, epf_etf, description } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { payment_date, emp_name, salary_start_date, salary_end_date, nic, type, basic_days, basic_rate, bonus_salary, ot_hours, ot_rate, epf_etf, description };
+
+        const result = await SalariesRecord.findByIdAndUpdate(id, updateData);
 
         if (!result) {
             return response.status(404).json({ message: 'Transaction record not found' });

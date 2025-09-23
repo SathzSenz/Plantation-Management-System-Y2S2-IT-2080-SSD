@@ -67,7 +67,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const {id} = request.params;
 
-        const result = await MarketPriceRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { name, type, date, min_price, max_price } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { name, type, date, min_price, max_price };
+
+        const result = await MarketPriceRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if(!result){
             throw createNotFoundError('Market Price record');

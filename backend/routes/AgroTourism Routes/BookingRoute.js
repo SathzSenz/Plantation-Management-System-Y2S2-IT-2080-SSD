@@ -81,7 +81,23 @@ router.get('/:id', asyncHandler(async (request, response) => {
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
-        const result = await Booking.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { name, telNo, nicNo, email, selectedPackage, date, numberOfDays, numberOfPeople, visitorType, totalPayment } = request.body;
+
+        // Check if all required fields are provided
+        if (!name || !telNo || !nicNo || !email || !selectedPackage || !date || !numberOfPeople || !visitorType)  {
+            throw createValidationError('All required fields must be provided: name, telNo, nicNo, email, selectedPackage, date');
+        }
+
+        // Additional validation for guidedFarmTour package
+        if (selectedPackage === 'guidedFarmTour' && !numberOfDays) {
+            throw createValidationError('Number of days is required for the guided farm tour package');
+        }
+
+        // Create update object with only allowed fields
+        const updateData = { name, telNo, nicNo, email, selectedPackage, date, numberOfDays, numberOfPeople, visitorType, totalPayment };
+
+        const result = await Booking.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Booking');

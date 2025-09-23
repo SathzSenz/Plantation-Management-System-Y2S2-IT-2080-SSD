@@ -68,7 +68,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await ValuationsRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { date, type, subtype, quantity, price, description, payer_payee, appreciationOrDepreciation } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { date, type, subtype, quantity, price, description, payer_payee, appreciationOrDepreciation };
+
+        const result = await ValuationsRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Valuation record');

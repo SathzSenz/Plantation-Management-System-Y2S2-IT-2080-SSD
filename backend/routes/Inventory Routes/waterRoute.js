@@ -60,8 +60,11 @@ router.put('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('All required data must be provided');
         }
 
+        // Create update object with only allowed fields
+        const updateData = { water_level1, water_level2, water_date, water_des };
+
         // Find and update the water record
-        const updatedRecord = await WaterRecord.findByIdAndUpdate(id, request.body, { new: true });
+        const updatedRecord = await WaterRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!updatedRecord) {
             throw createNotFoundError('Water record');

@@ -82,8 +82,11 @@ router.put('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('All required data must be provided');
         }
 
+        // Create update object with only allowed fields
+        const updateData = { Eq_machine_main, Eq_id_main, date_referred, date_received, price, pay_person, ref_loc, status, comment };
+
         // Find and update the inventory record
-        const updatedRecord = await InventoryRecord.findByIdAndUpdate(id, request.body, { new: true });
+        const updatedRecord = await InventoryRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!updatedRecord) {
             throw createNotFoundError('Inventory record');

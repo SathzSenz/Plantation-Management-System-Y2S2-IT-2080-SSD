@@ -71,7 +71,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await TestRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { first_name, last_name, uemail, country, street_address, city, region, postal_code } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { first_name, last_name, uemail, country, street_address, city, region, postal_code };
+
+        const result = await TestRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Test record');

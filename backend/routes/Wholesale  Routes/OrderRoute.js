@@ -48,7 +48,13 @@ router.put('/:id', asyncHandler(async (request, response) =>{
 
         const {id} = request.params;
 
-        const result = await Orders.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { orderQuantity } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { orderQuantity };
+
+        const result = await Orders.findByIdAndUpdate(id, updateData, { new: true });
 
         if(!result){
             throw createNotFoundError('Order record');

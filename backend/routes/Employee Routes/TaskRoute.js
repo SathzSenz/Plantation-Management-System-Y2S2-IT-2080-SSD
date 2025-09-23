@@ -72,7 +72,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await TaskRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { emp_id, task, assign_date, due_date, task_des, task_status } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { emp_id, task, assign_date, due_date, task_des, task_status };
+
+        const result = await TaskRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Task record');

@@ -81,7 +81,13 @@ router.put('/:id', async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await MachinesTask.findByIdAndUpdate(id, request.body);
+        // Extract only allowed fields from request body
+        const { start_date, name, type, rate, payee, description } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { start_date, name, type, rate, payee, description };
+
+        const result = await MachinesTask.findByIdAndUpdate(id, updateData);
 
         if (!result) {
             return response.status(404).json({ message: 'Transaction record not found' });

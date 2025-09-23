@@ -77,7 +77,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
             throw createValidationError('Send all required fields');
         }
 
-        const cropInput = await CropInputs.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { date, type, field, quantity, remarks, unitCost } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { date, type, field, quantity, remarks, unitCost };
+
+        const cropInput = await CropInputs.findByIdAndUpdate(id, updateData, { new: true });
         if (!cropInput) {
             throw createNotFoundError('Crop input');
         }

@@ -74,7 +74,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await HarvestingRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { date, cropType, ageOfYield, wayPicked, treesPicked, quantity, remarks } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { date, cropType, ageOfYield, wayPicked, treesPicked, quantity, remarks };
+
+        const result = await HarvestingRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Harvest record');

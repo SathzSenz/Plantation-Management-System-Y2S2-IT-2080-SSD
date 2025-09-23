@@ -59,7 +59,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await MachinesRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { task_id, record_date, reading_start, reading_end, record_pay } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { task_id, record_date, reading_start, reading_end, record_pay };
+
+        const result = await MachinesRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Machine record');

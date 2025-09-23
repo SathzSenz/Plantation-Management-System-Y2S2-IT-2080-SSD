@@ -62,7 +62,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await AttendanceRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { e_name, e_date, att_status } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { e_name, e_date, att_status };
+
+        const result = await AttendanceRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Attendance record');

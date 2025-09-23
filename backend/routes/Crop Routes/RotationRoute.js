@@ -62,7 +62,13 @@ router.put('/:id', asyncHandler(async(request, response) => {
 
         const {id} = request.params;
 
-        const result = await Rotation.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { season, fieldName, cropType, variety, quantity, yield, remarks } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { season, fieldName, cropType, variety, quantity, yield, remarks };
+
+        const result = await Rotation.findByIdAndUpdate(id, updateData, { new: true });
         
         if (!result) {
             throw createNotFoundError('Rotation record');

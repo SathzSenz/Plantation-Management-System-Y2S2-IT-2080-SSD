@@ -65,7 +65,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
-        const result = await TransactionsRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { date, type, subtype, amount, description, payer_payee, method } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { date, type, subtype, amount, description, payer_payee, method };
+
+        const result = await TransactionsRecord.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!result) {
             throw createNotFoundError('Transaction record');

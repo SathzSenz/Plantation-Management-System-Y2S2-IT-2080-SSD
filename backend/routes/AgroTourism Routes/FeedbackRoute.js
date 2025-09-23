@@ -55,8 +55,19 @@ router.put('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
+        // Extract only allowed fields from request body
+        const { name, email, feedback, rating } = req.body;
+
+        // Check if all required fields are provided
+        if (!name || !email || !feedback || !rating) {
+            throw createValidationError('All required fields must be provided: name, email, feedback, rating');
+        }
+
+        // Create update object with only allowed fields
+        const updateData = { name, email, feedback, rating };
+
         // Find and update the feedback document by ID in the database
-        const updatedFeedback = await Feedback.findByIdAndUpdate(id, req.body, { new: true });
+        const updatedFeedback = await Feedback.findByIdAndUpdate(id, updateData, { new: true });
 
         // If the feedback document is not found, send a 404 response
         if (!updatedFeedback) {

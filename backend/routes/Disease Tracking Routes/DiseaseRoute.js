@@ -182,7 +182,13 @@ router.put('/:id', asyncHandler(async (request, response) => {
             }
         }
 
-        const result = await DiseasesRecord.findByIdAndUpdate(id, request.body, { new: true });
+        // Extract only allowed fields from request body
+        const { disease_name, plant_id, crop, date, location, plant_count, treatment, severity, status } = request.body;
+
+        // Create update object with only allowed fields
+        const updateData = { disease_name, plant_id, crop, date, location, plant_count, treatment, severity, status };
+
+        const result = await DiseasesRecord.findByIdAndUpdate(id, updateData, { new: true });
         if(!result){
             throw createNotFoundError('Disease record');
         }

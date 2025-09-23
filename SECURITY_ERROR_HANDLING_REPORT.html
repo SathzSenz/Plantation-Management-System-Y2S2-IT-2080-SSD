@@ -121,6 +121,72 @@
           <li>Refactored to use centralized helpers.</li>
         </ul>
       </li>
+      <li class="file"><strong>Mass Assignment Vulnerability Fixes</strong>
+        <ul>
+          <li>Fixed direct <code>request.body</code> assignment in <code>findByIdAndUpdate</code> calls across all routes.</li>
+          <li>Implemented explicit field extraction and validation before database updates.</li>
+          <li>Added field whitelisting to prevent unauthorized field updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/AgroTourism Routes/FeedbackRoute.js</code>
+        <ul>
+          <li>Fixed mass assignment in PUT route by extracting only allowed fields: <code>name, email, feedback, rating</code>.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Finance Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>TransactionsRoute.js</code>, <code>ValuationRoute.js</code>, <code>MachineRecordRoute.js</code>, <code>SalaryRoute.js</code>, <code>MachineTaskRoute.js</code>.</li>
+          <li>Each route now extracts only specific allowed fields before database updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Inventory Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>InventoryRecordRoute.js</code>, <code>EqMaintainroute.js</code>, <code>waterRoute.js</code>.</li>
+          <li>Implemented field extraction for all update operations.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Employee Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>RegistrationRoute.js</code>, <code>TaskRoute.js</code>, <code>AttendanceRoute.js</code>.</li>
+          <li>Added explicit field validation and extraction.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Wholesale Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>ProductRoute.js</code>, <code>OrderRoute.js</code>.</li>
+          <li>Implemented field whitelisting for product and order updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Crop Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>CropInputRoute.js</code>, <code>RotationRoute.js</code>.</li>
+          <li>Added field extraction for crop-related updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Disease Tracking Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>DiseaseRoute.js</code>.</li>
+          <li>Implemented field validation for disease record updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/FarmAnalysis Routes/*</code>
+        <ul>
+          <li>Fixed mass assignment in <code>MarketPriceRoute.js</code>.</li>
+          <li>Added field extraction for market price updates.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/Harvest Routes/RecordRoute.js</code>
+        <ul>
+          <li>Fixed mass assignment in harvest record updates.</li>
+          <li>Implemented field whitelisting for harvest data.</li>
+        </ul>
+      </li>
+      <li class="file"><code>backend/routes/AgroTourism Routes/BookingRoute.js</code>
+        <ul>
+          <li>Fixed mass assignment in booking updates.</li>
+          <li>Added comprehensive field validation and extraction.</li>
+        </ul>
+      </li>
     </ul>
 
     <h2>Frontend Changes</h2>
@@ -168,6 +234,9 @@
       <li class="warn">No stack traces or internal fields are exposed to clients in 5xx cases.</li>
       <li class="ok">Validation and not-found messages are exposed with appropriate 4xx status codes.</li>
       <li class="ok">Correlated logging with <code>X-Request-Id</code> for incident analysis.</li>
+      <li class="ok"><strong>Mass Assignment Protection</strong>: All database update operations now use explicit field extraction instead of direct <code>request.body</code> assignment, preventing unauthorized field updates.</li>
+      <li class="ok"><strong>Field Whitelisting</strong>: Each route defines exactly which fields can be updated, preventing attackers from modifying sensitive or unintended fields.</li>
+      <li class="ok"><strong>Input Validation</strong>: All extracted fields are validated before database operations, ensuring data integrity.</li>
     </ul>
 
     <h2>Next Steps for Complete Adoption</h2>
@@ -196,6 +265,10 @@
       </li>
       <li class="file">Internal error (500) [optional]
         Temporarily throw an <code>Error</code> in a handler; Expected: generic <em>Internal server error</em>, no stack trace.
+      </li>
+      <li class="file">Mass Assignment Protection Test
+        <pre>curl -i -X PUT http://localhost:5555/transactions/ID -H "Content-Type: application/json" -d '{"date":"2024-01-01","type":"income","subtype":"sales","amount":1000,"description":"Test","payer_payee":"Customer","method":"cash","malicious_field":"hacked"}' | cat</pre>
+        Expected: Only allowed fields are updated; <code>malicious_field</code> is ignored and not stored in database.
       </li>
     </ul>
 
