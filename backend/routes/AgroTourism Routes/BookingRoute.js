@@ -1,6 +1,6 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Booking from '../../models/AgroTourism Models/BookingModel.js';
-import cors from 'cors';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
 const router = express.Router();
@@ -67,6 +67,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const booking = await Booking.findById(id);
 
         if (!booking) {
@@ -78,6 +82,10 @@ router.get('/:id', asyncHandler(async (request, response) => {
 // Route to update a booking
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Extract only allowed fields from request body
         const { name, telNo, nicNo, email, selectedPackage, date, numberOfDays, numberOfPeople, visitorType, totalPayment } = request.body;
@@ -106,6 +114,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route to delete a booking
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await Booking.findByIdAndDelete(id);
 

@@ -1,5 +1,6 @@
 // Import the necessary modules and models
 import express from 'express';
+import mongoose from 'mongoose';
 import Feedback from '../../models/AgroTourism Models/FeedbackModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
@@ -38,6 +39,10 @@ router.get('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         // Find the feedback document by ID in the database
         const feedback = await Feedback.findById(id);
 
@@ -54,6 +59,10 @@ router.get('/:id', asyncHandler(async (req, res) => {
 router.put('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Extract only allowed fields from request body
         const { name, email, feedback, rating } = req.body;
@@ -82,6 +91,10 @@ router.put('/:id', asyncHandler(async (req, res) => {
 router.delete('/:id', asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Find and delete the feedback document by ID in the database
         const deletedFeedback = await Feedback.findByIdAndDelete(id);

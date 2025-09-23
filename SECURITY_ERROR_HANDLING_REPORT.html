@@ -128,6 +128,26 @@
           <li>Added field whitelisting to prevent unauthorized field updates.</li>
         </ul>
       </li>
+      <li class="file"><strong>ObjectId Validation & Query Param Sanitization</strong>
+        <ul>
+          <li>Added <code>mongoose.Types.ObjectId.isValid</code> checks for all <code>:id</code> routes before executing MongoDB queries.</li>
+          <li>Prevents malformed IDs from reaching the database and blocks potential injection via path params.</li>
+          <li>Affected routes include:
+            <ul>
+              <li><code>AgroTourism</code>: <code>FeedbackRoute.js</code>, <code>BookingRoute.js</code></li>
+              <li><code>Finance</code>: <code>TransactionsRoute.js</code>, <code>ValuationRoute.js</code>, <code>MachineRecordRoute.js</code>, <code>MachineTaskRoute.js</code>, <code>SalaryRoute.js</code></li>
+              <li><code>Inventory</code>: <code>InventoryRecordRoute.js</code>, <code>EqMaintainroute.js</code>, <code>waterRoute.js</code></li>
+              <li><code>Harvest</code>: <code>RecordRoute.js</code></li>
+              <li><code>Crop</code>: <code>CropInputRoute.js</code>, <code>RotationRoute.js</code></li>
+              <li><code>Disease Tracking</code>: <code>DiseaseRoute.js</code></li>
+              <li><code>Wholesale</code>: <code>ProductRoute.js</code>, <code>OrderRoute.js</code></li>
+              <li><code>FarmAnalysis</code>: <code>MarketPriceRoute.js</code></li>
+              <li><code>Test</code>: <code>TestRoute.js</code></li>
+            </ul>
+          </li>
+          <li>On invalid IDs, routes now return a standardized 400 with a safe message via centralized error handling (or equivalent 400 response where legacy style remained).</li>
+        </ul>
+      </li>
       <li class="file"><code>backend/routes/AgroTourism Routes/FeedbackRoute.js</code>
         <ul>
           <li>Fixed mass assignment in PUT route by extracting only allowed fields: <code>name, email, feedback, rating</code>.</li>

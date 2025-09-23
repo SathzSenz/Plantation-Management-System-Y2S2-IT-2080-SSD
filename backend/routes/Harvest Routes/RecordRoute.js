@@ -1,5 +1,6 @@
 import {HarvestingRecord} from "../../models/Harvest Models/RecordModels.js";
 import express from "express";
+import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
@@ -48,6 +49,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const record = await HarvestingRecord.findById(id);
 
         if (!record) {
@@ -73,6 +78,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
         }
 
         const { id } = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Extract only allowed fields from request body
         const { date, cropType, ageOfYield, wayPicked, treesPicked, quantity, remarks } = request.body;
@@ -91,6 +100,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route for Delete a harvest record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await HarvestingRecord.findByIdAndDelete(id);
 

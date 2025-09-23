@@ -1,10 +1,8 @@
-import express, {request, response} from "express";
+import express from "express";
+import mongoose from 'mongoose';
 import { Products } from '../../models/Wholesale Models/ProductModel.js';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
-// import upload from "../../ProductPictures/Pictures.js";
-
-
 const router = express.Router();
 
 router.post('/', asyncHandler(async (request, response) => {
@@ -47,17 +45,14 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async(request,response) =>{
         const  {id} = request.params;
 
-        // if(!id){
-        //     return response.status(400).json({ message: 'ID parameter is required' });
-        // }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
 
         const  productRecords = await Products.findById(id);
         if (!productRecords) throw createNotFoundError('Product record');
         return response.success(productRecords);
-        // if(!productRecords){
-        //     return response.status(404).json({ message: 'Product Record not found' });
-        // }
-        //return response.status(200).jason(productRecords);
 }));
 
 
@@ -73,6 +68,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
         }
 
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         // Extract only allowed fields from request body
         const { productID, productName, productDescription, productQuantity, productPrice } = request.body;
@@ -90,6 +89,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 router.delete('/:id', async (request, response) =>{
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const  result = await Products.findByIdAndDelete(id);
 

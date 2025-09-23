@@ -1,5 +1,6 @@
 import {DiseasesRecord} from "../../models/Disease Tracking Models/DiseasesModel.js";
 import express, {request, response} from "express";
+import mongoose from 'mongoose';
 import {InventoryRecord} from "../../models/Inventory Models/EqMaintainModel.js";
 import {InventoryInput} from "../../models/Inventory Models/InventoryRecordModel.js";
 import {subMonths, subYears, format, subWeeks} from "date-fns";
@@ -113,6 +114,9 @@ router.get('/g', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const {id} = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const disease = await DiseasesRecord.findById(id);
         if (!disease) throw createNotFoundError('Disease record');
         return response.success(disease);
@@ -135,6 +139,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
         }
 
         const {id} = request.params;
+        
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const updatedRecord = request.body;
         const currentRecord = await DiseasesRecord.findById(id);
 
@@ -188,6 +196,9 @@ router.put('/:id', asyncHandler(async (request, response) => {
         // Create update object with only allowed fields
         const updateData = { disease_name, plant_id, crop, date, location, plant_count, treatment, severity, status };
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const result = await DiseasesRecord.findByIdAndUpdate(id, updateData, { new: true });
         if(!result){
             throw createNotFoundError('Disease record');
@@ -198,6 +209,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 //delete disease record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const {id} = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await DiseasesRecord.findByIdAndDelete(id);
 

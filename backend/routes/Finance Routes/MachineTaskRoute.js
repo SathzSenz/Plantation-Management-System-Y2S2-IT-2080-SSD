@@ -1,5 +1,6 @@
 import {MachinesTask} from "../../models/Finance Models/MachineTaskModel.js";
 import express from "express";
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -58,6 +59,9 @@ router.get('/:id', async (request, response) => {
     try {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return response.status(400).json({ message: 'Invalid ID format' });
+        }
         const MachineRecord = await MachinesTask.findById(id);
 
         return response.status(200).json(MachineRecord);
@@ -80,6 +84,10 @@ router.put('/:id', async (request, response) => {
         }
 
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return response.status(400).json({ message: 'Invalid ID format' });
+        }
 
         // Extract only allowed fields from request body
         const { start_date, name, type, rate, payee, description } = request.body;
@@ -105,6 +113,9 @@ router.delete('/:id', async (request, response) => {
     try {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return response.status(400).json({ message: 'Invalid ID format' });
+        }
         const result = await MachinesTask.findByIdAndDelete(id);
 
         if (!result) {

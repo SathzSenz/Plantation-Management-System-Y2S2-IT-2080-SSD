@@ -40,6 +40,9 @@ router.get('/:id', asyncHandler(async (request, response) => {
         if (!id) {
             throw createValidationError('ID parameter is required');
         }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const waterRecord = await WaterRecord.findById(id);
         if (!waterRecord) {
             throw createNotFoundError('Water record');
@@ -50,6 +53,9 @@ router.get('/:id', asyncHandler(async (request, response) => {
 // Update water record
 router.put('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const {
             water_level1,
             water_level2,
@@ -75,6 +81,9 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Delete water record
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
         const result = await WaterRecord.findByIdAndDelete(id);
         if (!result) {
             throw createNotFoundError('Water record');

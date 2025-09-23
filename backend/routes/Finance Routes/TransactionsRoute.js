@@ -1,5 +1,6 @@
 import {TransactionsRecord} from "../../models/Finance Models/TransactionsModel.js";
 import express from "express";
+import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 
@@ -44,6 +45,10 @@ router.get('/', asyncHandler(async (request, response) => {
 router.get('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         const TransactionRecord = await TransactionsRecord.findById(id);
         if (!TransactionRecord) throw createNotFoundError('Transaction record');
         return response.success(TransactionRecord);
@@ -65,6 +70,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
         const { id } = request.params;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
+
         // Extract only allowed fields from request body
         const { date, type, subtype, amount, description, payer_payee, method } = request.body;
 
@@ -82,6 +91,10 @@ router.put('/:id', asyncHandler(async (request, response) => {
 // Route for Delete a book
 router.delete('/:id', asyncHandler(async (request, response) => {
         const { id } = request.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw createValidationError('Invalid ID format');
+        }
 
         const result = await TransactionsRecord.findByIdAndDelete(id);
 
