@@ -13,6 +13,14 @@ export function notFoundMiddleware(req, res, next) {
 }
 
 export function errorHandler(err, req, res, next) {
+    // Handle CSRF errors explicitly
+    if (err && (err.code === 'EBADCSRFTOKEN' || err.name === 'EBADCSRFTOKEN')) {
+        return res.status(403).json({
+            success: false,
+            error: { code: 403, message: 'Invalid CSRF token' }
+        });
+    }
+
     const statusCode = err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
     const isOp = isOperationalError(err);
 
