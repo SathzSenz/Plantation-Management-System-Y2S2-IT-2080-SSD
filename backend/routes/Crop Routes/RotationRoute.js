@@ -71,11 +71,11 @@ router.put('/:id', asyncHandler(async(request, response) => {
             throw createValidationError('Invalid ID format');
         }
 
-        // Extract only allowed fields from request body
-        const { season, fieldName, cropType, variety, quantity, yield, remarks } = request.body;
+        // Extract only allowed fields from request body (alias reserved word 'yield')
+        const { season, fieldName, cropType, variety, quantity, remarks, yield: cropYield } = request.body;
 
         // Create update object with only allowed fields
-        const updateData = { season, fieldName, cropType, variety, quantity, yield, remarks };
+        const updateData = { season, fieldName, cropType, variety, quantity, yield: cropYield, remarks };
 
         const result = await Rotation.findByIdAndUpdate(id, updateData, { new: true });
         
