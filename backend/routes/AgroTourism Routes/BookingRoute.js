@@ -5,8 +5,6 @@ import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
 const router = express.Router();
 
-router.use(cors()); // Enable CORS for all routes
-
 // Route to get bookings by user ID
 router.get('/booking', asyncHandler(async (req, res) => {
     const userId = req.query.userId;
