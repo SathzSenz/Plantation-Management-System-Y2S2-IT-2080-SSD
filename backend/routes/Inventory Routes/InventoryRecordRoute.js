@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 import {InventoryInput} from "../../models/Inventory Models/InventoryRecordModel.js";
-import { protect, authorize } from "../../middleware/auth.js";
+import { protect, authorize, authorizeResource, filterUserResources } from "../../middleware/auth.js";
 
 const router = express.Router();
 
@@ -52,7 +52,8 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
             payer,
             expire_date,
             description,
-            ava_status
+            ava_status,
+            userId: request.user._id
         });
 
         return response.success(newInventoryInput, 201);
@@ -60,13 +61,13 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
 
 
 // Get all inventory records
-router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
-        const inventoryinputs = await InventoryInput.find({});
+router.get('/',protect, authorize('user'), filterUserResources(InventoryInput, { userField: 'userId' }), asyncHandler(async (request, response) => {
+        const inventoryinputs = await InventoryInput.find({ userId: request.user._id });
         return response.success({ count: inventoryinputs.length, data: inventoryinputs });
 }));
 
 // Get inventory record by ID
-router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), authorizeResource(InventoryInput), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         // Ensure id is not undefined
@@ -86,7 +87,7 @@ router.get('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 }));
 
 // Update inventory record
-router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), authorizeResource(InventoryInput), asyncHandler(async (request, response) => {
         const { id } = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -150,7 +151,7 @@ router.put('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 
 
 // Delete inventory record
-router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), authorizeResource(InventoryInput), asyncHandler(async (request, response) => {
         const { id } = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {

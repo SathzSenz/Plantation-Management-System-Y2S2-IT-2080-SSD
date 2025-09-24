@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { CropInputs } from '../../models/Crop Models/CropInputModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
-import { protect, authorize } from "../../middleware/auth.js";
+import { protect, authorize, authorizeResource, filterUserResources } from "../../middleware/auth.js";
 
 
 const router = express.Router();
@@ -43,7 +43,8 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
             field,
             quantity,
             remarks,
-            unitCost
+            unitCost,
+            userId: request.user._id
         };
 
         if (type === 'Planting') {
@@ -57,13 +58,13 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
 }));
 
 // Get all records
-router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
-        const cropInputs = await CropInputs.find({});
+router.get('/',protect, authorize('user'), filterUserResources(CropInputs, { userField: 'userId' }), asyncHandler(async (request, response) => {
+        const cropInputs = await CropInputs.find({ userId: request.user._id });
         return response.success({ count: cropInputs.length, data: cropInputs });
 }));
 
 // Get one record by id
-router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), authorizeResource(CropInputs), asyncHandler(async (request, response) => {
         const { id } = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -75,7 +76,7 @@ router.get('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 }));
 
 // Update record
-router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), authorizeResource(CropInputs), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -102,7 +103,7 @@ router.put('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 }));
 
 // Route to delete a record
-router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), authorizeResource(CropInputs), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
-import { protect, authorize } from "../../middleware/auth.js";
+import { protect, authorize, authorizeResource, filterUserResources } from "../../middleware/auth.js";
 
 
 const router = express.Router();
@@ -30,6 +30,7 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
             description: request.body.description,
             payer_payee: request.body.payer_payee,
             method: request.body.method,
+            userId: request.user._id,
         };
 
         const TransactionRecord = await TransactionsRecord.create(NewTransactionsRecord);
@@ -38,13 +39,13 @@ router.post('/',protect, authorize('user'), asyncHandler(async (request, respons
 
 // Route for Get All from database
 
-router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
-        const TransactionRecord = await TransactionsRecord.find({});
+router.get('/',protect, authorize('user'), filterUserResources(TransactionsRecord, { userField: 'userId' }), asyncHandler(async (request, response) => {
+        const TransactionRecord = await TransactionsRecord.find({ userId: request.user._id });
         return response.success({ count: TransactionRecord.length, data: TransactionRecord });
 }));
 
 // Route for Get One transaction from database by id
-router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), authorizeResource(TransactionsRecord), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -57,7 +58,7 @@ router.get('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 }));
 
 // Route for Update a transaction
-router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), authorizeResource(TransactionsRecord), asyncHandler(async (request, response) => {
         if (
             !request.body.date ||
             !request.body.type ||
@@ -91,7 +92,7 @@ router.put('/:id',protect, authorize('user'), asyncHandler(async (request, respo
 }));
 
 // Route for Delete a book
-router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), authorizeResource(TransactionsRecord), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

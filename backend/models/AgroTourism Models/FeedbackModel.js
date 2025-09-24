@@ -18,6 +18,11 @@ const feedbackSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
     },
     {
         timestamps: true,

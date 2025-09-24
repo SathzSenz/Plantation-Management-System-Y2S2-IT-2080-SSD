@@ -49,3 +49,84 @@ export const authorize = (roles = []) => {
     next();
   };
 };
+
+// Resource-level authorization middleware
+export const authorizeResource = (Model, options = {}) => {
+  return async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user._id;
+      const userRoles = req.user.roles;
+
+      // Admins can access all resources
+      if (userRoles.includes('admin')) {
+        return next();
+      }
+
+      // For routes that don't have an ID parameter (like GET /), allow access
+      if (!id) {
+        return next();
+      }
+
+      // Find the resource
+      const resource = await Model.findById(id);
+      if (!resource) {
+        return next(createError(404, 'Resource not found'));
+      }
+
+      // Check if resource has user ownership field
+      if (resource.userId || resource.createdBy) {
+        const ownerId = resource.userId || resource.createdBy;
+        if (ownerId.toString() !== userId.toString()) {
+          return next(createError(403, 'Forbidden: You can only access your own resources'));
+        }
+      } else if (resource.email && req.user.email) {
+        // For resources identified by email (like feedback)
+        if (resource.email !== req.user.email) {
+          return next(createError(403, 'Forbidden: You can only access your own resources'));
+        }
+      } else if (options.allowManagers && userRoles.includes('manager')) {
+        // Managers can access resources in their scope
+        return next();
+      } else {
+        // For resources without clear ownership, only allow managers and admins
+        if (!userRoles.includes('manager') && !userRoles.includes('admin')) {
+          return next(createError(403, 'Forbidden: Insufficient permissions to access this resource'));
+        }
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+// Middleware to ensure user can only access their own data in list endpoints
+export const filterUserResources = (Model, options = {}) => {
+  return async (req, res, next) => {
+    try {
+      const userId = req.user._id;
+      const userRoles = req.user.roles;
+
+      // Admins can see all resources
+      if (userRoles.includes('admin')) {
+        return next();
+      }
+
+      // Store original query for later use
+      const originalQuery = req.query;
+      
+      // Add user filter to the query
+      if (options.userField) {
+        req.query[options.userField] = userId.toString();
+      } else if (options.emailField && req.user.email) {
+        req.query[options.emailField] = req.user.email;
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};

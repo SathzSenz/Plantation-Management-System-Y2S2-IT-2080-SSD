@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import Feedback from '../../models/AgroTourism Models/FeedbackModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
-import { protect, authorize } from "../../middleware/auth.js";
+import { protect, authorize, authorizeResource, filterUserResources } from "../../middleware/auth.js";
 
 
 // Create an Express router
@@ -20,24 +20,30 @@ router.post('/', protect, authorize('user'),asyncHandler(async (req, res) => {
             throw createValidationError('All required fields must be provided: name, email, feedback, rating');
         }
 
-        // Create a new feedback document in the database
-        const newFeedback = await Feedback.create({ name, email, feedback, rating });
+        // Create a new feedback document in the database with user ownership
+        const newFeedback = await Feedback.create({ 
+            name, 
+            email, 
+            feedback, 
+            rating, 
+            userId: req.user._id 
+        });
 
         // Send a success response with the newly created feedback document
         return res.success(newFeedback, 201);
 }));
 
 // Route to get all feedbacks from the database
-router.get('/',protect, authorize('user'), asyncHandler(async (req, res) => {
-        // Fetch all feedback documents from the database
-        const feedbacks = await Feedback.find({});
+router.get('/',protect, authorize('user'), filterUserResources(Feedback, { userField: 'userId' }), asyncHandler(async (req, res) => {
+        // Fetch feedback documents from the database (filtered by user)
+        const feedbacks = await Feedback.find({ userId: req.user._id });
 
         // Send a success response with the fetched feedback documents
         res.success({ count: feedbacks.length, data: feedbacks });
 }));
 
 // Route to get a feedback by ID
-router.get('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
+router.get('/:id',protect, authorize('user'), authorizeResource(Feedback), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
@@ -58,7 +64,7 @@ router.get('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
 }));
 
 // Route to update a feedback
-router.put('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
+router.put('/:id',protect, authorize('user'), authorizeResource(Feedback), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
@@ -90,7 +96,7 @@ router.put('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
 }));
 
 // Route to delete a feedback
-router.delete('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
+router.delete('/:id',protect, authorize('user'), authorizeResource(Feedback), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
