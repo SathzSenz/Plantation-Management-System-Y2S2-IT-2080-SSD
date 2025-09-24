@@ -1,3 +1,4 @@
+// backend/index.js
 import express from "express";
 import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
@@ -51,29 +52,46 @@ app.use(cookieParser());
 
 //const Images = mongoose.model("productModel");
 
+// ---------- RATE LIMITER CONFIG (minimal changes: skip OPTIONS + consistent handler) ----------
 const globalLimiter = rateLimit({
-      windowMs: 15 * 60 * 1000,  // 15 minutes
-      max: 100,
-      standardHeaders: true,
-      legacyHeaders: false,
-    });
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    // don't count preflight OPTIONS (important for CORS)
+    skip: (req) => req.method === 'OPTIONS',
+    handler: (req, res) => res.status(429).json({ success: false, error: { code: 429, message: 'Too many requests, please try again later.' } }),
+});
 
-    const bookingLimiter = rateLimit({
-      windowMs: 60 * 1000,
-      max: 10,
-      message: { error: 'Too many booking requests, please try again later.' },
-      standardHeaders: true,
-      legacyHeaders: false,
-    });
+const bookingLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => req.method === 'OPTIONS',
+    handler: (req, res) => res.status(429).json({ success: false, error: { code: 429, message: 'Too many booking requests, please try again later.' } }),
+});
 
-    app.use(globalLimiter);
+const transactionsLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 20, // allow 20 requests per IP per 5 minutes
+    message: { error: "Too many transaction requests, please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// -------------------------------------------------------------------------
 
 app.use(cors({
     origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000', 'https://elemahana.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'X-CSRF-Token'],
     credentials: true,
 }));
+app.options('*', cors()); // explicit preflight handler
+
+// apply global limiter AFTER cors so preflight OPTIONS aren't limited
+app.use(globalLimiter);
 
 // response helpers and request id
 import { attachResponseHelpers } from './middleware/responseMiddleware.js';
@@ -105,6 +123,7 @@ app.get('/csrf-token', (req, res) => {
 });
 
 app.get('/', (request, response) => {
+    // don't log full request object in prod — kept here because it was in your original file
     console.log(request);
     return response.status(234).send('welcome to Elemahana');
 });
@@ -112,17 +131,18 @@ app.get('/', (request, response) => {
 
 
 app.use('/financeincome', testRoute);
-app.use('/transactions', TransactionsRoute);
+app.use('/transactions', transactionsLimiter, TransactionsRoute);
 app.use('/valuation', ValuationRoute);
 app.use('/machines', MachineTaskRoute);
 app.use('/machineRecord', MachineRecordRoute);
 app.use('/salary', SalaryRoute);
 app.use('/weather', WeatherAPI)
 
+// booking routes with bookingLimiter
 app.use(['/booking', '/confirmation'], bookingLimiter, BookingRoute);
 
-app.use('/feedbacklist',FeedbackRoute);
-app.use('/feedback',FeedbackRoute);
+app.use('/feedbacklist', FeedbackRoute);
+app.use('/feedback', FeedbackRoute);
 
 app.use('/diseases', DiseaseRoute);
 app.use('/marketprice', MarketPriceRoute);
@@ -136,9 +156,9 @@ app.use('/inventoryrecords', EqMaintainroute);
 app.use('/waterRecords', WaterRoute);
 app.use('/inventoryinputs', InventoryRecordRoute);
 
-app.use('/employeeRecords',RegistrationRoute);
-app.use('/taskRecords',TaskRoute);
-app.use('/attendanceRecords',AttendanceRoute);
+app.use('/employeeRecords', RegistrationRoute);
+app.use('/taskRecords', TaskRoute);
+app.use('/attendanceRecords', AttendanceRoute);
 
 app.use('/productRecords' ,ProductRoute);
 app.use('/orderRecords', OrderRoute);
@@ -146,12 +166,16 @@ app.use('/orderRecords', OrderRoute);
 
 app.use('/record', recordRoute);
 
-app.use('/checkTreatment',TreatmentSelectionRoute);
+app.use('/checkTreatment', TreatmentSelectionRoute);
 app.use('/count', DiseaseCountRoute);
 
 // 404 for unmatched routes
 app.use(notFoundMiddleware);
 
+// centralized error handler must be the last middleware
+app.use(errorHandler);
+
+// DB connect + listen
 if (process.env.NODE_ENV !== "test") {
     // dev/prod mode → connect DB + start server
     mongoose
@@ -172,7 +196,3 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 export default app; // for Supertest
-
-
-// centralized error handler must be the last middleware
-app.use(errorHandler);

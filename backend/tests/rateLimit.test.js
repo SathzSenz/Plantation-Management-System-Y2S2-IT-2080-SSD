@@ -19,8 +19,9 @@ describe("Rate Limiting", () => {
         // The last one should be blocked
         expect(lastResponse.status).toBe(429);
         expect(lastResponse.body).toHaveProperty(
-            "error",
+            "error.message",
             "Too many booking requests, please try again later."
         );
+
     });
 });
