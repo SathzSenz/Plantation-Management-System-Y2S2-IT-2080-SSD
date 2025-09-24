@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "Elemahana - CSRF Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "a8a8c6a1-1c4f-4f6d-9b1e-9d7a9e0c3c7a"
+  },
+  "item": [
+    {
+      "name": "Get CSRF Token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/csrf-token",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "csrf-token"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "const token = json && json.data ? json.data.csrfToken : null;",
+              "if (token) { pm.environment.set('csrfToken', token); }",
+              "pm.test('CSRF token present', function () { pm.expect(token).to.be.a('string'); });",
+              "// Cookies (_csrf and XSRF-TOKEN) are stored in Postman cookie jar automatically"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Transaction - without CSRF (expect 403)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Txn (no CSRF)\",\n  \"amount\": 100,\n  \"type\": \"income\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/transactions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "transactions"
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Should be 403 Forbidden', function () { pm.response.to.have.status(403); });",
+              "pm.test('Has Invalid CSRF token message', function () { pm.expect(pm.response.text()).to.include('Invalid CSRF token'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Transaction - with CSRF",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Auto-fetch CSRF token if missing",
+              "if (!pm.environment.get('csrfToken')) {",
+              "  pm.sendRequest({ url: pm.environment.get('baseUrl') + '/csrf-token', method: 'GET' }, function (err, res) {",
+              "    try { const json = res.json(); pm.environment.set('csrfToken', json.data.csrfToken); } catch (e) {}",
+              "  });",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Should be success (2xx)', function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Txn\",\n  \"amount\": 100,\n  \"type\": \"income\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/transactions",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "transactions"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "{{baseUrl}}" },
+    { "key": "csrfToken", "value": "" }
+  ]
+}
+
+

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Report: CSRF Protection Implementation</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; margin: 0; padding: 24px; background: #fafafa; }
+      .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 28px; border-radius: 10px; box-shadow: 0 0 12px rgba(0,0,0,0.06); }
+      h1 { color: #2c3e50; border-bottom: 3px solid #27ae60; padding-bottom: 10px; }
+      h2 { color: #34495e; border-left: 4px solid #2980b9; padding-left: 12px; margin-top: 28px; }
+      h3 { color: #2c3e50; margin-top: 22px; }
+      .note { background: #eafaf1; border: 1px solid #c6f3d8; padding: 12px; border-radius: 6px; }
+      .warn { background: #fff3cd; border: 1px solid #ffe08a; padding: 12px; border-radius: 6px; }
+      .critical { background: #f8d7da; border: 1px solid #f5c2c7; padding: 12px; border-radius: 6px; }
+      pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 12px; overflow-x: auto; font-size: 13px; }
+      code { background: #f6f8fa; padding: 2px 6px; border-radius: 4px; }
+      ul { padding-left: 20px; }
+      li { margin: 6px 0; }
+      table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+      th, td { border: 1px solid #e1e4e8; padding: 10px; text-align: left; }
+      th { background: #f6f8fa; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔒 CSRF Protection: Design, Implementation, and Verification</h1>
+      <p><strong>Generated:</strong> <span id="date"></span></p>
+      <p><strong>Vulnerability:</strong> Cross-Site Request Forgery (CSRF)</p>
+      <p><strong>Risk Level:</strong> Critical</p>
+
+      <h2>Overview</h2>
+      <p>CSRF attacks force a logged-in victim's browser to send authenticated requests to your application. Without mitigations, any attacker-controlled site could perform state-changing actions using the victim's session cookies.</p>
+
+      <h2>Mitigation Strategy (SPA + Express)</h2>
+      <ul>
+        <li><strong>Cookie-based secret + per-request token</strong> using <code>csurf</code> and <code>cookie-parser</code>.</li>
+        <li><strong>Token distribution endpoint</strong> at <code>GET /csrf-token</code>, sends token JSON and mirrors to readable cookie <code>XSRF-TOKEN</code>.</li>
+        <li><strong>Frontend</strong> fetches token and attaches it in header <code>X-CSRF-Token</code> for unsafe methods.</li>
+        <li><strong>CORS</strong> configured with <code>credentials: true</code>, allowed origin(s), and header <code>X-CSRF-Token</code>.</li>
+        <li><strong>Error handling</strong> returns 403 with standardized body for invalid tokens.</li>
+      </ul>
+
+      <h2>How This CSRF Protection Works (Step-by-Step)</h2>
+      <ol>
+        <li><strong>Server seeds a secret in a cookie:</strong> The <code>csurf</code> middleware uses <code>cookie-parser</code> to maintain a signed, HTTP-only cookie that stores a CSRF secret (not the token). This cookie cannot be read by malicious sites.</li>
+        <li><strong>Client requests a CSRF token:</strong> The SPA calls <code>GET /csrf-token</code>. Using the secret from the cookie, the server derives a short-lived <em>token</em> and returns it in JSON. For convenience, we also mirror it to a non-HTTP-only cookie <code>XSRF-TOKEN</code> (useful for traditional forms).</li>
+        <li><strong>Client attaches the token on unsafe methods:</strong> For POST/PUT/PATCH/DELETE, the frontend inserts the token into the <code>X-CSRF-Token</code> request header and sends the request along with cookies (<code>credentials: 'include'</code>).</li>
+        <li><strong>Server validates token vs secret:</strong> The server re-derives what the token should be using the secret in the HTTP-only cookie and compares it to the token sent in the header. If they match, the request is accepted; otherwise a <code>403 Invalid CSRF token</code> response is returned.</li>
+        <li><strong>Why this stops CSRF:</strong> An attacker can cause the browser to send cookies, but cannot read our token or compute a valid token because they don’t know the secret stored in our HTTP-only cookie. Their forged request arrives <em>without</em> a valid token and is rejected.</li>
+      </ol>
+
+      <h2>Files Changed</h2>
+      <table>
+        <thead><tr><th>File</th><th>Change</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td><code>backend/index.js</code></td><td>Add <code>cookie-parser</code>, <code>csurf</code>, CORS credentials, <code>/csrf-token</code> route</td><td>Enable server-side CSRF defense and token provisioning</td></tr>
+          <tr><td><code>backend/middleware/errorMiddleware.js</code></td><td>Handle <code>EBADCSRFTOKEN</code> with 403</td><td>Standardize CSRF error responses</td></tr>
+          <tr><td><code>frontend/src/apiClient.js</code></td><td>Fetch token, attach header for unsafe methods, enable credentials</td><td>Ensure all write requests include CSRF token</td></tr>
+          <tr><td><code>frontend/src/index.js</code></td><td>Import client to attach global interceptors</td><td>Initialize CSRF + response normalization at app start</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Key Backend Snippets</h2>
+      <h3>Mount CSRF and Token Endpoint</h3>
+      <pre><code>// backend/index.js (excerpt)
+import cookieParser from 'cookie-parser';
+import csurf from 'csurf';
+
+app.use(cookieParser());
+app.use(cors({ origin: [...], credentials: true, allowedHeaders: ['Content-Type', 'X-CSRF-Token'] }));
+
+const csrfProtection = csurf({
+  cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' },
+});
+app.use(csrfProtection);
+
+app.get('/csrf-token', (req, res) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken(), { httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' });
+  res.status(200).json({ success: true, data: { csrfToken: req.csrfToken() }, requestId: req.requestId });
+});</code></pre>
+
+      <h3>CSRF Error Handling</h3>
+      <pre><code>// backend/middleware/errorMiddleware.js (excerpt)
+if (err && (err.code === 'EBADCSRFTOKEN' || err.name === 'EBADCSRFTOKEN')) {
+  return res.status(403).json({ success: false, error: { code: 403, message: 'Invalid CSRF token' } });
+}</code></pre>
+
+      <h2>Key Frontend Snippets</h2>
+      <h3>Axios + fetch Integration</h3>
+      <pre><code>// frontend/src/apiClient.js (excerpt)
+export const api = axios.create({ baseURL: process.env.REACT_APP_API_BASE_URL, withCredentials: true });
+
+let csrfToken = null;
+async function ensureCsrfToken() {
+  if (csrfToken) return csrfToken;
+  const res = await fetch((process.env.REACT_APP_API_BASE_URL || '') + '/csrf-token', { credentials: 'include' });
+  const json = await res.json().catch(() => ({}));
+  csrfToken = json?.data?.csrfToken || null;
+  return csrfToken;
+}
+
+api.interceptors.request.use(async (config) => {
+  const method = (config.method || 'get').toLowerCase();
+  if (['post','put','patch','delete'].includes(method)) {
+    const token = await ensureCsrfToken();
+    if (token) config.headers['X-CSRF-Token'] = token;
+  }
+  config.withCredentials = true;
+  return config;
+});
+
+export async function safeFetch(input, init = {}) {
+  const method = (init.method || 'GET').toUpperCase();
+  let headers = init.headers || {};
+  if (['POST','PUT','PATCH','DELETE'].includes(method)) {
+    const token = await ensureCsrfToken();
+    if (token) headers = { ...headers, 'X-CSRF-Token': token };
+  }
+  return fetch(input, { ...init, headers, credentials: 'include' });
+}</code></pre>
+
+      <h2>Security Considerations</h2>
+      <ul>
+        <li><strong>SameSite</strong>: <code>Lax</code> in development, <code>None + Secure</code> in production for cross-site deployments.</li>
+        <li><strong>CORS</strong>: Allow only trusted origins; credentials required for cookie-based CSRF.</li>
+        <li><strong>Token scope</strong>: Token bound to cookie secret; attacker cannot read token due to origin policy.</li>
+        <li><strong>Idempotent requests</strong>: Ensure state change only with unsafe methods; avoid using GET for mutations.</li>
+        <li><strong>Rotation</strong>: Token refresh occurs automatically via <code>/csrf-token</code> when needed.</li>
+      </ul>
+
+      <h2>Verification & Testing</h2>
+      <h3>Backend (curl)</h3>
+      <ol>
+        <li>Fetch CSRF token and cookie:
+<pre><code>curl -i -c cookies.txt -b cookies.txt \
+  "${API_BASE:-http://localhost:5555}/csrf-token" | cat</code></pre>
+        </li>
+        <li>Use token in a POST with cookies:
+<pre><code>TOKEN=$(curl -s -c cookies.txt -b cookies.txt "${API_BASE:-http://localhost:5555}/csrf-token" | jq -r '.data.csrfToken')
+curl -i -c cookies.txt -b cookies.txt -X POST \
+  "${API_BASE:-http://localhost:5555}/feedback" \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $TOKEN" \
+  -d '{"name":"t","rating":5,"comment":"ok"}' | cat</code></pre>
+        </li>
+        <li>Omit token (should be 403):
+<pre><code>curl -i -c cookies.txt -b cookies.txt -X POST \
+  "${API_BASE:-http://localhost:5555}/feedback" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"t","rating":5,"comment":"ok"}' | cat</code></pre>
+        </li>
+      </ol>
+
+      <h3>Postman (or REST Client) Test</h3>
+      <ol>
+        <li>Enable <strong>Cookie Jar</strong> and check <strong>Follow Authorization header</strong> if applicable.</li>
+        <li>GET <code>/csrf-token</code> with <strong>Send cookies</strong> enabled; confirm <code>XSRF-TOKEN</code> cookie set and JSON contains <code>data.csrfToken</code>.</li>
+        <li>Create a POST (e.g., <code>/feedback</code>) with body and headers:
+          <ul>
+            <li><code>Content-Type: application/json</code></li>
+            <li><code>X-CSRF-Token: &lt;value from data.csrfToken&gt;</code></li>
+          </ul>
+          Response should be 2xx.</li>
+        <li>Remove the <code>X-CSRF-Token</code> header and resend → expect <strong>403 Invalid CSRF token</strong>.</li>
+      </ol>
+
+      <h3>Browser (Frontend) Test</h3>
+      <ol>
+        <li>Open app, perform any state-changing action (submit form, create/delete record).</li>
+        <li>DevTools → Network → request details: confirm headers include <code>X-CSRF-Token</code> and <code>Cookie</code> is sent (credentials enabled).</li>
+        <li>Application → Storage → Cookies: delete <code>XSRF-TOKEN</code>, repeat action → client fetches <code>/csrf-token</code> automatically and retries with header.</li>
+        <li>Temporarily block the <code>X-CSRF-Token</code> header (override in DevTools) and retry → expect 403 response.</li>
+      </ol>
+
+      <h3>Negative Cross-Site Test</h3>
+      <p class="warn">From a different domain (not in allowed CORS origins), attempt a POST without the header. Browser should either block due to CORS or server should respond 403 due to missing/invalid token.</p>
+
+      <h3>Frontend (manual)</h3>
+      <ul>
+        <li>Open app; DevTools → Network.</li>
+        <li>Trigger any POST/PUT/DELETE (e.g., create feedback/transaction).</li>
+        <li>Verify request includes header <code>X-CSRF-Token</code> and credentials.</li>
+        <li>Delete the <code>XSRF-TOKEN</code> cookie, trigger again → token refetched.</li>
+        <li>From a different origin without token → server responds 403 Invalid CSRF token.</li>
+      </ul>
+
+      <h2>Operational Notes</h2>
+      <ul>
+        <li>Set <code>CORS_ORIGINS</code> to the exact frontend origins.</li>
+        <li>Behind proxies, ensure <code>trust proxy</code> is configured if needed for cookies.</li>
+        <li>Consider rate limiting the <code>/csrf-token</code> endpoint.</li>
+      </ul>
+
+      <script>document.getElementById('date').textContent = new Date().toISOString();</script>
+    </div>
+  </body>
+</html>
