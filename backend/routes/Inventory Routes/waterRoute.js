@@ -3,11 +3,12 @@ import { WaterRecord } from "../../models/Inventory Models/waterModel.js";
 import mongoose from "mongoose";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 // Save a new water record
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {
             water_level1,
             water_level2,
@@ -29,13 +30,13 @@ router.post('/', asyncHandler(async (request, response) => {
 }));
 
 // Get all water records
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const waterRecords = await WaterRecord.find({});
         return response.success({ count: waterRecords.length, data: waterRecords });
 }));
 
 // Get water record by ID
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
         if (!id) {
             throw createValidationError('ID parameter is required');
@@ -51,7 +52,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Update water record
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw createValidationError('Invalid ID format');
@@ -79,7 +80,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Delete water record
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id', protect, authorize('user'),asyncHandler(async (request, response) => {
         const { id } = request.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw createValidationError('Invalid ID format');

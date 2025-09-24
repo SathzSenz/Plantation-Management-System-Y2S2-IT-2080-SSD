@@ -1,124 +1,98 @@
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { Fragment, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-
-import { Dialog, Disclosure, Popover, Transition } from '@headlessui/react';
-import {
-    Bars3Icon,
-    ChartPieIcon,
-    CursorArrowRaysIcon,
-    FingerPrintIcon,
-    XMarkIcon,
-    UserCircleIcon
-} from '@heroicons/react/24/outline';
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon, UserCircleIcon as UserCircleIconSolid } from '@heroicons/react/20/solid';
-import {Link} from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 import { safeFetch } from "../../apiClient";
 
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ');
-}
-
 export default function Navbar() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { login, register, logout, user, isAuthenticated, isLoading, getToken } = useKindeAuth();
-    const location = useLocation();
-    const {getPermission, getPermissions} = useKindeAuth();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Kinde React SDK handles redirects via provider; no manual callback needed here
-
-    const fetchData = async () => {
+    // Fetch current user from backend (if JWT cookie exists)
+    const fetchUser = async () => {
         try {
-            const accessToken = await getToken();
-            const res = await safeFetch(`${process.env.REACT_APP_KINDE_DOMAIN}/api`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
+            const res = await safeFetch(`${process.env.REACT_APP_API_BASE_URL}/auth/me`, {
+                credentials: 'include', // send cookie
             });
-            const { data } = await res.json();
-            console.log({ data });
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+                console.log(data.user);
+            } else {
+                setUser(null);
+            }
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            setUser(null);
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (isLoading) {
-        return <p>Loading</p>;
+    useEffect(() => {
+  const init = async () => {
+    await fetchUser();
+    if (window.location.search.includes('logged_in=true')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('logged_in');
+      window.history.replaceState({}, document.title, url.toString());
     }
+  };
+  init();
+}, []);
+
+
+
+    const handleGoogleLogin = () => {
+    window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?prompt=select_account`;
+};
+
+    const handleLogout = async () => {
+    try {
+        await safeFetch(`${process.env.REACT_APP_API_BASE_URL}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        setUser(null);
+
+        // Force Google logout (redirect to Google's logout page)
+        window.location.href = 'https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost:3000';
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+
+    if (loading) return <p>Loading...</p>;
 
     return (
         <header className="bg-white bg-opacity-70 backdrop-blur text-emerald-950 sticky top-0 w-screen z-50 shadow-md">
-            <nav
-                className="text-lg h-full mx-auto flex max-w-7xl items-center relative justify-between p-6 lg:px-8 py-2 gap-4">
-                {/* Navbar content */}
+            <nav className="text-lg h-full mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8 py-2 gap-4">
                 <div className="flex lg:flex-1">
                     <Link to="/" className="-m-1.5 p-1.5">
-                        <span className="text-2xl font-bold flex flex-row">ELEMAHANA <span
-                            className="font-light text-base">&trade;</span></span>
+                        <span className="text-2xl font-bold flex flex-row">ELEMAHANA <span className="font-light text-base">&trade;</span></span>
                     </Link>
                 </div>
-                <Link to="/" className="nav-item">
-                    <div
-                        className="h-full font-medium px-6 rounded-full transition-all duration-200 hover:bg-lime-200">Home
-                    </div>
-                </Link>
-                <Link to="/placeOrder" className="nav-item">
-                    <div
-                        className="h-full font-medium px-6 rounded-full transition-all duration-200 hover:bg-lime-200">Marketplace
-                    </div>
-                </Link>
-                <Link to="/tourism" className="nav-item">
-                    <div
-                        className="h-full font-medium px-6 rounded-full transition-all duration-200 hover:bg-lime-200">Visit
-                        Us
-                    </div>
-                </Link>
 
-
-                        <Link to="/dashboard" className="nav-item">
-                            <div className="h-full font-medium px-6 rounded-full transition-all duration-200 hover:bg-lime-200">
-                                Dashboard
-                            </div>
-                        </Link>
-
-
-
-
-                <div
-                    className="hidden lg:flex lg:flex-1 lg:justify-end gap-4 font-medium content-center items-center align-middle">
-                    {isAuthenticated ? (
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-4 items-center">
+                    {user ? (
                         <>
-                            <UserCircleIconSolid className="w-6 h-6"/>
-                            <div className="text-xs text-gray-400">{user.email}</div>
-                            <button onClick={logout}
-                                    className="px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-black bg-red-200 hover:bg-red-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Logout
+                            <div className="text-sm font-medium">{user.name || user.email}</div>
+                            <button
+                                onClick={handleLogout}
+                                className="px-3 py-1 border border-transparent text-sm font-medium rounded-full text-black bg-red-200 hover:bg-red-400 transition-all duration-200"
+                            >
+                                Logout
                             </button>
-
                         </>
                     ) : (
-                        <>
-                            <button onClick={register} type="button"
-                                    className="px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-black bg-lime-200 transition-all duration-200  hover:bg-lime-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">Register
-                            </button>
-                            <button onClick={() => login(
-                                {
-                                    authUrlParams: {login_hint: "john@exmail.com"},
-                                    app_state: {
-                                        redirectTo: location.state ? location.state?.from?.pathname : null
-                                    }
-                                }
-                                )}
-                                    type="button"
-                                    className="px-3 py-1 border border-lime-500 text-sm leading-4 font-medium rounded-full text-black transition-all duration-200 hover:bg-lime-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500">Log
-                                In
-                            </button>
-                            <UserCircleIcon className="w-6 h-6"/>
-                        </>
+                        <button
+                            onClick={handleGoogleLogin}
+                            className="px-3 py-1 border border-transparent text-sm font-medium rounded-full text-black bg-lime-500 hover:bg-lime-600 transition-all duration-200"
+                        >
+                            Login
+                        </button>
                     )}
                 </div>
-
             </nav>
-
         </header>
     );
 }

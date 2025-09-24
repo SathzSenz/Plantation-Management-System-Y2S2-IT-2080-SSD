@@ -110,8 +110,24 @@ export default function SideBar() {
     ];
 
     const systemItems = [
-        { name: "Logout", path: "/", icon: ArrowLeftStartOnRectangleIcon },
+        { name: "Logout", path: "/", icon: ArrowLeftStartOnRectangleIcon, action: "logout" },
     ];
+
+    const handleLogout = async () => {
+    try {
+      // Log out from your backend (JWT cookie)
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+
+      //Clear frontend state if needed
+      setCurrentWeekData({});
+
+      // Redirect to Google logout to clear Google session
+      window.location.href =
+        'https://accounts.google.com/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost:3000';
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
     return (
         <div className="bg-gray-100 bottom-0 top-12 fixed w-1/6 border-r flex flex-col justify-between divide-y divide-gray-300">

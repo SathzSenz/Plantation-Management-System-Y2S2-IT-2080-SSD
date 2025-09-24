@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import LoadingAnimation from "./components/utility/LoadingAnimation";
-import {KindeProvider} from "@kinde-oss/kinde-auth-react";
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
+// Pages
 import LandingPage from "./pages/landingPage.js";
 import SigninPage from "./pages/signinPage.js";
 import Dashboard from "./pages/Dashboard.js";
-
 
 import Finances from "./pages/finance_pages/Finances.js";
 import FinanceIncome from "./pages/finance_pages/income_records/FinanceIncome";
@@ -38,7 +37,7 @@ import CropManagement from "./pages/crop_pages/CropManagement";
 import CropRotation from "./pages/crop_pages/Rotation Management/CropRotation";
 import AddRotationPage from "./pages/crop_pages/Rotation Management/AddRotationPage";
 import ViewRotation from "./pages/crop_pages/Rotation Management/ViewRotation";
-import UpdateRotation from "./pages/crop_pages/Rotation Management/UpdateRotation"
+import UpdateRotation from "./pages/crop_pages/Rotation Management/UpdateRotation";
 import AddCropInput from "./pages/crop_pages/Crop Input/AddCropInput";
 import ViewPlantingPage from "./pages/crop_pages/Crop Input/ViewPlantingPage";
 import ViewChemicalPage from "./pages/crop_pages/Crop Input/ViewChemicalPage";
@@ -47,14 +46,14 @@ import ViewPlantingRecord from "./pages/crop_pages/Crop Input/ViewPlantingRecord
 import ViewRotationRecord from "./pages/crop_pages/Rotation Management/ViewRotationRecord";
 import ViewChemicalRecord from "./pages/crop_pages/Crop Input/ViewChemicalRecord";
 
-import MaintenanceLog from "./pages/inventory_pages/Eq and Machines/MaintenanceLog"
+import MaintenanceLog from "./pages/inventory_pages/Eq and Machines/MaintenanceLog";
 import AddEqMainPage from "./pages/inventory_pages/Eq and Machines/AddEqMainPage";
 import EditEqMainPage from "./pages/inventory_pages/Eq and Machines/EditEqMainPage";
 import Inventory from "./pages/inventory_pages/Inventory";
 import Water from "./pages/inventory_pages/Water/Water";
 import InventoryRecordList from "./pages/inventory_pages/Inventory_records/InventoryRecordListpage";
 import AddInventoryRecordsPage from "./pages/inventory_pages/Inventory_records/AddInventoryRecordsPage";
-import EditInventoryPage from"./pages/inventory_pages/Inventory_records/EditInventoryPage";
+import EditInventoryPage from "./pages/inventory_pages/Inventory_records/EditInventoryPage";
 import ViewOneRecord from "./pages/inventory_pages/Inventory_records/ViewOneRecord";
 import ViewOneMain from "./pages/inventory_pages/Eq and Machines/ViewOneMain";
 import InSettingsPage from "./pages/inventory_pages/settings/InSettingsPage";
@@ -64,7 +63,6 @@ import ViewAllDiseases from "./pages/diseaseTracking_pages/records/ViewAllDiseas
 import DiseaseVisualization from "./pages/diseaseTracking_pages/visualization/diseaseVisualization";
 import AddDiseaseRecord from "./pages/diseaseTracking_pages/records/AddDiseaseRecord";
 import UpdateDiseaseRecord from "./pages/diseaseTracking_pages/records/UpdateDiseaseRecord";
-
 import ViewDiseaseRecord from "./pages/diseaseTracking_pages/records/ViewDiseaseRecord";
 
 import Insights from "./pages/insights/Insights";
@@ -107,12 +105,9 @@ import EditFeedbackPg from "./pages/tourism_pages/EditFeedbackPg";
 
 import ViewEmpDetails from "./pages/employee_pages/emp_registation/ViewEmpDetails";
 import ViewTaskList from "./pages/employee_pages/task_assigning/ViewTaskList";
-
 import EditEmployeePage from "./pages/employee_pages/emp_registation/EditEmployeePage";
 import EditTask from "./components/Employee/Task_assign/EditTask";
 import EditTaskPage from "./pages/employee_pages/task_assigning/EditTaskPage";
-
-import ErrorPage from "./pages/ErrorPage";
 import ViewOneEmpDetails from "./pages/employee_pages/emp_registation/ViewOneEmpDetails";
 import ViewTaskDetails from "./pages/employee_pages/task_assigning/ViewTaskDetails";
 import ViewAllAttendance from "./pages/employee_pages/emp_attendance/ViewAllAttendance";
@@ -120,68 +115,58 @@ import GetAttendance from "./pages/employee_pages/emp_attendance/GetAttendance";
 import ViewOneAttendance from "./pages/employee_pages/emp_attendance/ViewOneAttendance";
 import AllBookingsPg from "./pages/tourism_pages/AllBookingsPg";
 
+import ErrorPage from "./pages/ErrorPage";
+
 export default function App() {
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
     // Simulate loading delay with useEffect
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
         }, 100); // Simulate 2 seconds loading time
-        return () => clearTimeout(timer);
-    }, []);
+    return () => clearTimeout(timer);
+  }, []);
 
+  return (
+    <div className="App">
+      {loading ? (
+        <LoadingAnimation />
+      ) : (
+        <Routes>
+          {/* Auth */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<SigninPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-    return (
-        <KindeProvider
-            clientId={process.env.REACT_APP_KINDE_CLIENT_ID}
-            domain={process.env.REACT_APP_KINDE_DOMAIN}
-            redirectUri={process.env.REACT_APP_KINDE_REDIRECT_URI}
-            logoutUri={process.env.REACT_APP_KINDE_LOGOUT_URI}
-            onRedirectCallback={(user, app_state) => {
-                if (app_state?.redirectTo) {
-                    window.location = app_state?.redirectTo;
-                }
-            }}
-        >
-        <div className="App">
-            {loading ? (
-                <LoadingAnimation />
-            ) : (
-                <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<SigninPage />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-
-
-                    <Route path="/finances/home" element={<Finances />} />
-                    <Route path="/finances/financeincome" element={<FinanceIncome />} />
-                    <Route path="/finances/financeincome/addnewrecord" element={<AddNewIncomeRecord />} />
+          {/* Finances */}
+          <Route path="/finances/home" element={<Finances />} />
+          <Route path="/finances/financeincome" element={<FinanceIncome />} />
+          <Route path="/finances/financeincome/addnewrecord" element={<AddNewIncomeRecord />} />
                     <Route path="/finances/financeincome/viewrecord" element={<FinanceIncome />} />
                     <Route path="/finances/financeincome/updaterecord" element={<FinanceIncome />} />
                     <Route path="/finances/financeincome/deleterecord" element={<FinanceIncome />} />
 
-                    <Route path="/finances/transactions" element={<ViewAllTransactions />} />
-                    <Route path="/finances/transactions/addTransaction" element={<AddNewTransaction />} />
-                    <Route path="/finances/transactions/viewTransactionDetails/:id" element={<ViewTransactionDetails />} />
-                    <Route path="/finances/transactions/editTransaction/:id" element={<EditTransaction />} />
-                    <Route path="/finances/transactions/deleteTransaction" element={<DeleteTransaction />} />
-
-                    <Route path="/finances/salaryPayment" element={<SalaryPayments />} />
-                    <Route path="/finances/salaryPayment/pastRecords" element={<ViewPastRecords />} />
-
-                    <Route path="/finances/valuation" element={<Valuation />} />
+          <Route path="/finances/transactions" element={<ViewAllTransactions />} />
+          <Route path="/finances/transactions/addTransaction" element={<AddNewTransaction />} />
+          <Route path="/finances/transactions/viewTransactionDetails/:id" element={<ViewTransactionDetails />} />
+          <Route path="/finances/transactions/editTransaction/:id" element={<EditTransaction />} />
+          <Route path="/finances/transactions/deleteTransaction" element={<DeleteTransaction />} />
+          <Route path="/finances/salaryPayment" element={<SalaryPayments />} />
+          <Route path="/finances/salaryPayment/pastRecords" element={<ViewPastRecords />} />
+          <Route path="/finances/valuation" element={<Valuation />} />
                     <Route path="/finances/valuation/addValuation" element={<AddNewValuation/>} />
-                    <Route path="/finances/valuation/editValuation/:id" element={<EditValuation />} />
-                    <Route path="/finances/valuation/viewValuation/:id" element={<ViewValuationDetails />} />
+          <Route path="/finances/valuation/editValuation/:id" element={<EditValuation />} />
+          <Route path="/finances/valuation/viewValuation/:id" element={<ViewValuationDetails />} />
                     <Route path="/finances/valuation/deleteValuation" element={<Valuation />} />
 
-                    <Route path="/finances/machineHours" element={<MachineHours />} />
-                    <Route path="/finances/machineHours/addMachineRecords" element={<AddNewMachineTask />} />
-                    <Route path="/finances/machineHours/editMachineRecords/:id" element={<EditMachineRecord />} />
-                    <Route path="/finances/machineHours/viewMachineRecords/:id" element={<ViewMachineRecord />} />
+          <Route path="/finances/machineHours" element={<MachineHours />} />
+          <Route path="/finances/machineHours/addMachineRecords" element={<AddNewMachineTask />} />
+          <Route path="/finances/machineHours/editMachineRecords/:id" element={<EditMachineRecord />} />
+          <Route path="/finances/machineHours/viewMachineRecords/:id" element={<ViewMachineRecord />} />
 
-                    <Route path="/settings" element={Settings()}/>
+          {/* Settings */}
+          <Route path="/settings" element={<Settings />} />
 
                     <Route path="/tourism" element={AgroTourism()}/>
                     <Route path="/feedback" element={Feedback()}/>
@@ -236,7 +221,7 @@ export default function App() {
                     <Route path= "/inventory/home" element={Inventory()}/>
                     <Route path= "/inventory/maintenancelog" element={MaintenanceLog()}/>
                     <Route path="/inventory/maintenancelog/addeqmainpage" element={(AddEqMainPage())}/>
-                    <Route path="/inventory/maintenancelog/editeqmainpage/:id" element={<EditEqMainPage />} />
+          <Route path="/inventory/maintenancelog/editeqmainpage/:id" element={<EditEqMainPage />} />
                     <Route path ="/inventory/maintenancelog/viewmain/:id" element={<ViewOneMain/>}/>
                     <Route path= "/inventory/water" element={Water()}/>
                     <Route path= "/inventory/inventoryrecords" element={InventoryRecordList()}/>
@@ -263,15 +248,14 @@ export default function App() {
                     <Route path="/harvest/calculateHarvest"  element={harvestCal()}/>
                     <Route path="/harvest/harvestRecords"  element={harvestRec()}/>
 
-                    <Route path="/harvest/records/addRecord" element={<AddRecord />} />
-                    <Route path="/harvest/records/updateRecord/:id" element={<EditHarvest />} />
-                    <Route path="/harvest/records" element={<HarvestList />} />
+          <Route path="/harvest/records/addRecord" element={<AddRecord />} />
+          <Route path="/harvest/records/updateRecord/:id" element={<EditHarvest />} />
+          <Route path="/harvest/records" element={<HarvestList />} />
 
                     <Route path = "*" element={<ErrorPage/>} />c
-                </Routes>
-            )}
-        </div>
-            <SpeedInsights/>
-        </KindeProvider>
-    );
+        </Routes>
+      )}
+      <SpeedInsights />
+    </div>
+  );
 }

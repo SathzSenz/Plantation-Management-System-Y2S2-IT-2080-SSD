@@ -3,15 +3,13 @@ import express from "express";
 import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
-
-
-
+import { protect, authorize } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 
 //Route to create new harvest record
-router.post('/', asyncHandler(async(request, response) =>
+router.post('/', protect, authorize('user'),asyncHandler(async(request, response) =>
 {
         if(
             !request.body.date ||
@@ -40,13 +38,13 @@ router.post('/', asyncHandler(async(request, response) =>
 }));
 
 //Route to get harvest records
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/', protect, authorize('user'),asyncHandler(async (request, response) => {
         const Records = await HarvestingRecord.find({});
         return response.success({ count: Records.length, data: Records });
 }));
 
 //Route to get a harvest record by ID
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -64,7 +62,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 
 
 //Route to update harvest record
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if(
             !request.body.date ||
             !request.body.cropType ||
@@ -98,7 +96,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Route for Delete a harvest record
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

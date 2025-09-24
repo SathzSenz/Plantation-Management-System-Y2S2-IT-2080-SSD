@@ -271,8 +271,7 @@ const EqMaintain = () => {
                                             aria-hidden="true"/>
                                     </Link>
                                 </td>
-                                {
-                                    getPermission("update:records").isGranted ? (
+                               
                                 <td className="px-6 py-4">
                                     <button className="flex items-center" onClick={() => handleDelete(record._id)}>
                                         <TrashIcon
@@ -280,8 +279,7 @@ const EqMaintain = () => {
                                             aria-hidden="true"/>
                                     </button>
                                 </td>
-                                    ): null
-                                }
+                                    
                             </tr>
                         ))}
                         </tbody>

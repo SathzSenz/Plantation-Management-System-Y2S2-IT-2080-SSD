@@ -1,11 +1,13 @@
 import {SalariesRecord} from "../../models/Finance Models/SalaryModel.js";
 import express from "express";
 import mongoose from 'mongoose';
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
 // create a new record
-router.post('/', async (request, response) => {
+router.post('/',protect, authorize('user'), async (request, response) => {
     try {
         const requiredFields = [
             'payment_date',
@@ -59,7 +61,7 @@ router.post('/', async (request, response) => {
 
 // Route for Get All from database
 
-router.get('/', async (request, response) => {
+router.get('/',protect, authorize('user'), async (request, response) => {
     try {
         const SalaryRecord = await SalariesRecord.find({});
 
@@ -74,7 +76,7 @@ router.get('/', async (request, response) => {
 });
 
 // Route for Get One transaction from database by id
-router.get('/:id', async (request, response) => {
+router.get('/:id',protect, authorize('user'), async (request, response) => {
     try {
         const { id } = request.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -90,7 +92,7 @@ router.get('/:id', async (request, response) => {
 });
 
 // Route for Update a transaction
-router.put('/:id', async (request, response) => {
+router.put('/:id',protect, authorize('user'), async (request, response) => {
     try {
         if (
             !request.body.payment_date ||
@@ -138,7 +140,7 @@ router.put('/:id', async (request, response) => {
 });
 
 // Route for Delete a book
-router.delete('/:id', async (request, response) => {
+router.delete('/:id',protect, authorize('user'), async (request, response) => {
     try {
         const { id } = request.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {

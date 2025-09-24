@@ -3,10 +3,12 @@ import mongoose from 'mongoose';
 import {MarketPriceRecord} from "../../models/FarmAnalysis Models/MarketPriceModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         console.log('Request Body:', request.body);
 
         const {name, date} = request.body;
@@ -43,7 +45,7 @@ router.post('/', asyncHandler(async (request, response) => {
         return response.success(marketPrice, 201);
 }));
 
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         let filter = {};
         // Check if a name filter is provided in the query parameters
         if (request.query.name) {
@@ -55,7 +57,7 @@ router.get('/', asyncHandler(async (request, response) => {
         return response.success({ count : marketPrice.length, data : marketPrice });
 }));
 
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
             !request.body.name ||
             !request.body.type ||
@@ -86,7 +88,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
         return response.success({message : 'Market Price record updated successfully', data: result});
 }));
 
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {id} = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

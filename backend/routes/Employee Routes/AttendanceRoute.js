@@ -3,13 +3,15 @@ import mongoose from 'mongoose';
 import {AttendanceRecord} from "../../models/EmpManagement/AttendanceModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 
 
 const router = express.Router();
 
 //Route for save a new attendance
-router.post('/', asyncHandler(async(request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async(request, response) => {
         if (
             !request.body.e_name ||
             !request.body.e_date||
@@ -32,7 +34,7 @@ router.post('/', asyncHandler(async(request, response) => {
 }));
 
 //Route to get all the attendance from the database
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const AttendanceRecords = await AttendanceRecord.find({});
         return response.success({
             count: AttendanceRecords.length,
@@ -41,7 +43,7 @@ router.get('/', asyncHandler(async (request, response) => {
 }));
 
 //Route for get one attendance from database by id
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -54,7 +56,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 
 //Route for update attendance
 
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
 
             !request.body.e_name ||
@@ -87,7 +89,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 //Route to delete an attendance record
 
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

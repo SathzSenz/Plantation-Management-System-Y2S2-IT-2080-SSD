@@ -3,11 +3,13 @@ import express from "express";
 import mongoose from 'mongoose';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
 // create a new record
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
             !request.body.date ||
             !request.body.type ||
@@ -36,13 +38,13 @@ router.post('/', asyncHandler(async (request, response) => {
 
 // Route for Get All from database
 
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const TransactionRecord = await TransactionsRecord.find({});
         return response.success({ count: TransactionRecord.length, data: TransactionRecord });
 }));
 
 // Route for Get One transaction from database by id
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -55,7 +57,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Route for Update a transaction
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
             !request.body.date ||
             !request.body.type ||
@@ -89,7 +91,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Route for Delete a book
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
