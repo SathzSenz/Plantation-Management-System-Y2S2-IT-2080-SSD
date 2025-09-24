@@ -3,9 +3,10 @@ import mongoose from 'mongoose';
 import { Products } from '../../models/Wholesale Models/ProductModel.js';
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
 const router = express.Router();
 
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
             !request.body.productID ||
             !request.body.productName ||
@@ -31,7 +32,7 @@ router.post('/', asyncHandler(async (request, response) => {
 }));
 
 
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const productrecords = await Products.find({});
         return response.success({
             count: productrecords.length,
@@ -42,7 +43,7 @@ router.get('/', asyncHandler(async (request, response) => {
 
 
 
-router.get('/:id', asyncHandler(async(request,response) =>{
+router.get('/:id',protect, authorize('user'), asyncHandler(async(request,response) =>{
         const  {id} = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -56,7 +57,7 @@ router.get('/:id', asyncHandler(async(request,response) =>{
 }));
 
 
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if(
             !request.body.productID ||
             !request.body.productName ||
@@ -87,7 +88,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
         return response.success({ message: 'Product record updated successfully', data: result });
 }));
 
-router.delete('/:id', async (request, response) =>{
+router.delete('/:id',protect, authorize('user'), async (request, response) =>{
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

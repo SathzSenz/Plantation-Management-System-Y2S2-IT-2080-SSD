@@ -4,9 +4,10 @@ import Booking from '../../models/AgroTourism Models/BookingModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
 const router = express.Router();
+import { protect, authorize } from "../../middleware/auth.js";
 
 // Route to get bookings by user ID
-router.get('/booking', asyncHandler(async (req, res) => {
+router.get('/booking',protect, authorize('user'), asyncHandler(async (req, res) => {
     const userId = req.query.userId;
     if (!userId) {
         throw createValidationError('User ID is required');
@@ -16,7 +17,7 @@ router.get('/booking', asyncHandler(async (req, res) => {
 }));
 
 // Route to save a new booking
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {
             name,
             telNo,
@@ -58,13 +59,13 @@ router.post('/', asyncHandler(async (request, response) => {
 }));
 
 // Route to get all the bookings from the database
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const bookings = await Booking.find({});
         return response.success({ count: bookings.length, data: bookings });
 }));
 
 // Route to get a booking by ID
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -80,7 +81,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Route to update a booking
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -112,7 +113,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Route to delete a booking
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

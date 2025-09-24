@@ -567,7 +567,7 @@ export default function MachineRecordsList() {
                                                                         <td className="px-6 py-4">{detail_record.reading_end}</td>
                                                                         <td className="px-6 py-4">{detail_record.record_pay.toLocaleString()}</td>
 
-                                                                        { getPermission("update:records").isGranted ? (
+                                                                        
 
                                                                         <td className=" ">
                                                                             <Button shape="circle" type="text"
@@ -577,8 +577,7 @@ export default function MachineRecordsList() {
                                                                                     aria-hidden="true"/>
                                                                             </Button>
                                                                         </td>
-                                                                        ) : null
-                                                                        }
+                                                                        
                                                                     </tr>
                                                                 ))
                                                             }
@@ -594,7 +593,7 @@ export default function MachineRecordsList() {
                                     </Popover>
                                 </td>
 
-                                { getPermission("update:records").isGranted ? (
+                                
 
                                 <td className=" py-4 text-right">
                                     <Link to={`/finances/machineHours/editMachineRecords/${record._id}`}>
@@ -605,10 +604,9 @@ export default function MachineRecordsList() {
                                     </Link>
                                 </td>
 
-                                ) : null
-                                }
+                                
 
-                                { getPermission("update:records").isGranted ? (
+                                
                                 <td className=" py-4 text-right">
                                     <Link to={`/finances/machineHours/viewMachineRecords/${record._id}`}>
                                         <InformationCircleIcon
@@ -617,10 +615,9 @@ export default function MachineRecordsList() {
                                         />
                                     </Link>
                                 </td>
-                                ) : null
-                                }
+                                
 
-                                { getPermission("update:records").isGranted ? (
+                              
                                 <td className=" ">
                                     <Button shape="circle" type="text" onClick={() => {
                                         handleDeleteMachineRecord(record._id);
@@ -632,8 +629,7 @@ export default function MachineRecordsList() {
                                     </Button>
 
                                 </td>
-                    ) : null
-                    }
+                   
                             </tr>
                         );
                     })}

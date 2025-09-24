@@ -2,12 +2,14 @@ import express, {request, response} from "express";
 import {DiseasesRecord} from "../../models/Disease Tracking Models/DiseasesModel.js";
 import moment from "moment";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 //assigning a value 31 days before to an object which stores current date
 const monthAgo = moment().subtract(31, 'days').format("YYYY-MM-DD");
 
-router.get('/untreatedPlants', asyncHandler(async (request, response) => {
+router.get('/untreatedPlants', protect, authorize('user'),asyncHandler(async (request, response) => {
         //aggregates data from MongoDB
         const sumTreesAffected = await DiseasesRecord.aggregate([
             {
@@ -33,7 +35,7 @@ router.get('/untreatedPlants', asyncHandler(async (request, response) => {
         return response.success({ totalTreesAffected });
 }));
 
-router.get('/recoveredPlants', asyncHandler(async (request, response) => {
+router.get('/recoveredPlants',protect, authorize('user'), asyncHandler(async (request, response) => {
         //aggregates data from MongoDB
         const sumTreesAffected = await DiseasesRecord.aggregate([
             {
@@ -59,7 +61,7 @@ router.get('/recoveredPlants', asyncHandler(async (request, response) => {
         return response.success({ totalTreesAffected });
 }));
 
-router.get('/underTreatmentPlants', asyncHandler(async (request, response) => {
+router.get('/underTreatmentPlants',protect, authorize('user'), asyncHandler(async (request, response) => {
         //aggregates data from MongoDB
         const sumTreesAffected = await DiseasesRecord.aggregate([
             {

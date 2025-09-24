@@ -7,11 +7,12 @@ import {subMonths, subYears, format, subWeeks} from "date-fns";
 import {CropInputs} from "../../models/Crop Models/CropInputModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 //create new disease record
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/', protect, authorize('user'), asyncHandler(async (request, response) => {
         console.log('Request Body:', request.body);
         if (
             !request.body.disease_name ||
@@ -78,12 +79,12 @@ router.post('/', asyncHandler(async (request, response) => {
 } ));
 
 //get disease records
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const disease = await DiseasesRecord.find({});
         return response.success({ count : disease.length, data : disease });
 }));
 
-router.get('/g', asyncHandler(async (request, response) => {
+router.get('/g',protect, authorize('user'), asyncHandler(async (request, response) => {
         const timeline = request.query.timeline
         let startDate;
 
@@ -111,7 +112,7 @@ router.get('/g', asyncHandler(async (request, response) => {
 }));
 
 //get disease record by id
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {id} = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -123,7 +124,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 }));
 
 //updating disease record
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
             !request.body.disease_name ||
             !request.body.plant_id||
@@ -207,7 +208,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 }));
 
 //delete disease record
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {id} = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -222,7 +223,7 @@ router.delete('/:id', asyncHandler(async (request, response) => {
         return response.success({message : 'Disease record deleted successfully'});
 }));
 
-router.get('/cropTypes', asyncHandler(async (req, res) => {
+router.get('/cropTypes',protect, authorize('user'), asyncHandler(async (req, res) => {
     const { location } = req.query;
     console.log('Selected location:', location);
     const cropRecords = await CropInputs.find({ field: location, cropType: {$exists: true} });

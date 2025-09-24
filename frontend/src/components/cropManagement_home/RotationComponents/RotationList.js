@@ -250,21 +250,21 @@ const RotationList = () => {
                                             className="h-6 w-6 bg-gray-300 p-1 rounded-full text-gray-800 hover:bg-gray-500"
                                             aria-hidden="true"/>
                                     </Link>
-                                    {getPermission("update:records").isGranted ? (
+                                   
                                         <Link to={`/crop/rotation/update/${record._id}`}
                                               className="mx-1 font-medium text-blue-600 hover:underline">
                                             <PencilSquareIcon
                                                 className="h-6 w-6 bg-blue-200 p-1 rounded-full text-gray-800 hover:bg-blue-500"
                                                 aria-hidden="true"/>
                                         </Link>
-                                    ) : null}
-                                    {getPermission("update:records").isGranted ? (
+                                  
+                                    
                                     <button className="flex items-center" onClick={() => handleDelete(record._id)}>
                                         <TrashIcon
                                             className="h-6 w-6 bg-red-200 p-1 rounded-full text-gray-800 hover:bg-red-500"
                                             aria-hidden="true"/>
                                     </button>
-                                    ) : null}
+                                  
                                 </div>
                             </td>
                         </tr>

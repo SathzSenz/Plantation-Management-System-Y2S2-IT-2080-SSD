@@ -4,12 +4,14 @@ import mongoose from 'mongoose';
 import Feedback from '../../models/AgroTourism Models/FeedbackModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 // Create an Express router
 const router = express.Router();
 
 // Route to save a new feedback
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/', protect, authorize('user'),asyncHandler(async (req, res) => {
         // Extract data from the request body
         const { name, email, feedback, rating } = req.body;
 
@@ -26,7 +28,7 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 // Route to get all feedbacks from the database
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (req, res) => {
         // Fetch all feedback documents from the database
         const feedbacks = await Feedback.find({});
 
@@ -35,7 +37,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 // Route to get a feedback by ID
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
@@ -56,7 +58,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }));
 
 // Route to update a feedback
-router.put('/:id', asyncHandler(async (req, res) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
@@ -88,7 +90,7 @@ router.put('/:id', asyncHandler(async (req, res) => {
 }));
 
 // Route to delete a feedback
-router.delete('/:id', asyncHandler(async (req, res) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (req, res) => {
         // Extract the feedback ID from the request parameters
         const { id } = req.params;
 
