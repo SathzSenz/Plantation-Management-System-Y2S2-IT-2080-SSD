@@ -1,4 +1,8 @@
 import express from "express";
+import helmet from "helmet";
+import passport from "passport";
+import dotenv from "dotenv";
+import sesssion from "express-session";
 import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { TestRecord } from "./models/TestModel.js";
@@ -7,6 +11,9 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import testRoute from "./routes/TestRoute.js";
+import AuthRoute from "./routes/AuthRoute.js";
+import setupGooglePassport from "./auth/passportGoogle.js";
+import { protect } from "./middleware/auth.js";
 
 import BookingRoute from "./routes/AgroTourism Routes/BookingRoute.js";
 import FeedbackRoute from "./routes/AgroTourism Routes/FeedbackRoute.js";
@@ -41,11 +48,21 @@ import TreatmentSelectionRoute from "./routes/Disease Tracking Routes/TreatmentS
 import PredictMarketPriceRoute from "./routes/FarmAnalysis Routes/PredictMarketPriceRoute.js";
 import MachineRecordRoute from "./routes/Finance Routes/MachineRecordRoute.js";
 
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(helmet());
+app.use(helmet.noSniff());
+
+setupGooglePassport();
+app.use(passport.initialize());
+
+
+
 
 //app.use(cors());
 
@@ -109,7 +126,7 @@ app.get('/', (request, response) => {
     return response.status(234).send('welcome to Elemahana');
 });
 
-
+app.use('/auth', AuthRoute);
 
 app.use('/financeincome', testRoute);
 app.use('/transactions', TransactionsRoute);

@@ -261,8 +261,7 @@ function WaterTank() {
                                 <td className="px-6 py-4 border-r whitespace-nowrap">{record.water_date.split("T")[0]}</td>
                                 <td className="px-6 py-4 border-r">{record.water_des ? record.water_des : "N/A"}</td>
 
-                                {
-                                    getPermission("update:records").isGranted ? (
+                             
                                 <td className="px-6 py-4">
                                     <div className="flex">
                                         <button
@@ -274,8 +273,6 @@ function WaterTank() {
                                         </button>
                                     </div>
                                 </td>
-                                    ): null
-                                }
                             </tr>
                             {index !== waterRecords.length - 1 && (
                                 <tr>

@@ -3,13 +3,15 @@ import mongoose from 'mongoose';
 import {TaskRecord} from "../../models/EmpManagement/TaskModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 
 
 const router = express.Router();
 
 //Route for save a new task
-router.post('/', asyncHandler(async(request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async(request, response) => {
         if (
             !request.body.emp_id ||
             !request.body.task||
@@ -38,7 +40,7 @@ router.post('/', asyncHandler(async(request, response) => {
 }));
 
 //Route to get all the tasks from the database
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const TaskRecords = await TaskRecord.find({});
         return response.success({
             count: TaskRecords.length,
@@ -47,7 +49,7 @@ router.get('/', asyncHandler(async (request, response) => {
 }));
 
 //Route for get one task from database by id
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -61,7 +63,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 
 //Route for update employee
 
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         if (
 
             !request.body.emp_id ||
@@ -97,7 +99,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 //Route to delete a task record
 
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {

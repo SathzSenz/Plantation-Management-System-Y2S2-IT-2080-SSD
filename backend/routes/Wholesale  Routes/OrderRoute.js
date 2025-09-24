@@ -3,10 +3,11 @@ import mongoose from 'mongoose';
 import {Orders} from '../../models/Wholesale Models/OrderModel.js'
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.post('/', asyncHandler(async(request, response) =>{
+router.post('/',protect, authorize('user'), asyncHandler(async(request, response) =>{
         if(
             !request.body.orderId ||
             !request.body.orderProductName ||
@@ -32,7 +33,7 @@ router.post('/', asyncHandler(async(request, response) =>{
         return response.success(order, 201);
 }));
 
-router.get('/', asyncHandler(async (request,response) =>{
+router.get('/',protect, authorize('user'), asyncHandler(async (request,response) =>{
         const orderrecords = await Orders.find({});
         return response.success({
             count: orderrecords.length,
@@ -40,7 +41,7 @@ router.get('/', asyncHandler(async (request,response) =>{
         });
 }));
 
-router.put('/:id', asyncHandler(async (request, response) =>{
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) =>{
         if(
             !request.body.orderQuantity
         ){
@@ -67,7 +68,7 @@ router.put('/:id', asyncHandler(async (request, response) =>{
         return response.success({ message: 'Order record updated successfully', data: result });
 }));
 
-router.get('/:id', asyncHandler(async (request, response) =>{
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) =>{
         const {id} =request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -79,7 +80,7 @@ router.get('/:id', asyncHandler(async (request, response) =>{
         return response.success(orderRecords);
 }));
 
-router.delete('/:id', asyncHandler(async(request, response) =>{
+router.delete('/:id',protect, authorize('user'), asyncHandler(async(request, response) =>{
         const {id} = request.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
