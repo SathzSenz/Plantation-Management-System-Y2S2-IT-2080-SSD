@@ -69,7 +69,7 @@ app.use(passport.initialize());
 
 //const Images = mongoose.model("productModel");
 
-// ---------- RATE LIMITER CONFIG (minimal changes: skip OPTIONS + consistent handler) ----------
+// ---------- RATE LIMITER CONFIG ----------
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  // 15 minutes
     max: 100,
@@ -107,7 +107,6 @@ app.use(cors({
 }));
 app.options('*', cors()); // explicit preflight handler
 
-// apply global limiter AFTER cors so preflight OPTIONS aren't limited
 app.use(globalLimiter);
 
 // response helpers and request id
@@ -117,8 +116,6 @@ app.use(requestIdMiddleware);
 app.use(attachResponseHelpers);
 
 // CSRF protection (cookie-based secret)
-// Note: For cross-site SPA (frontend on a different domain) the CSRF secret cookie
-// must use SameSite 'none'. Make this configurable via env for dev/prod parity.
 const CSRF_SAMESITE = (process.env.CSRF_COOKIE_SAMESITE || (process.env.NODE_ENV === 'production' ? 'none' : 'lax'));
 const CSRF_SECURE = (process.env.CSRF_COOKIE_SECURE ? process.env.CSRF_COOKIE_SECURE === 'true' : process.env.NODE_ENV === 'production');
 
@@ -145,7 +142,6 @@ app.get('/csrf-token', (req, res) => {
 });
 
 app.get('/', (request, response) => {
-    // don't log full request object in prod — kept here because it was in your original file
     console.log(request);
     return response.status(234).send('welcome to Elemahana');
 });
