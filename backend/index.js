@@ -82,11 +82,16 @@ app.use(requestIdMiddleware);
 app.use(attachResponseHelpers);
 
 // CSRF protection (cookie-based secret)
+// Note: For cross-site SPA (frontend on a different domain) the CSRF secret cookie
+// must use SameSite 'none'. Make this configurable via env for dev/prod parity.
+const CSRF_SAMESITE = (process.env.CSRF_COOKIE_SAMESITE || (process.env.NODE_ENV === 'production' ? 'none' : 'lax'));
+const CSRF_SECURE = (process.env.CSRF_COOKIE_SECURE ? process.env.CSRF_COOKIE_SECURE === 'true' : process.env.NODE_ENV === 'production');
+
 const csrfProtection = csurf({
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: CSRF_SECURE,
+        sameSite: CSRF_SAMESITE,
     },
 });
 
@@ -95,11 +100,11 @@ app.use(csrfProtection);
 
 // CSRF token endpoint for SPA to fetch token
 app.get('/csrf-token', (req, res) => {
-    // Optionally also mirror token in a readable cookie for non-AJAX forms
+    // Mirror token in a readable cookie to support traditional forms if needed
     res.cookie('XSRF-TOKEN', req.csrfToken(), {
         httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: CSRF_SECURE,
+        sameSite: CSRF_SAMESITE,
     });
     return res.status(200).json({ success: true, data: { csrfToken: req.csrfToken() }, requestId: req.requestId });
 });

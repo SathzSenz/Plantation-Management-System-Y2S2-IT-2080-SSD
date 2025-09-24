@@ -1,3 +1,6 @@
+// Centralized application error type
+// Fix addresses: Information disclosure via ad-hoc error handling by providing
+// a single, safe error structure. 'expose' controls what is safe to return.
 export class AppError extends Error {
     constructor(message, statusCode = 500, details = undefined, expose = false) {
         super(message);
@@ -13,6 +16,7 @@ export function isOperationalError(error) {
     return error instanceof AppError;
 }
 
+// Helper factories for common operational errors (safe to expose)
 export function createNotFoundError(resource = 'resource') {
     return new AppError(`${resource} not found`, 404, undefined, true);
 }

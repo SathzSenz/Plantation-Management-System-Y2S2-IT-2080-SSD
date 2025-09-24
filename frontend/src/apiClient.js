@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Axios instance with credentials for CSRF-protected API
 export const api = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL || 'https://elemahana-backend.vercel.app',
     headers: {
@@ -22,8 +23,9 @@ function normalizeRequestUrl(url) {
     return url;
 }
 // CSRF token cache
-let csrfToken = null;
+let csrfToken = null; // refreshed via /csrf-token
 
+// Fetch and cache CSRF token; also sets secret cookie from server
 async function ensureCsrfToken() {
     if (csrfToken) return csrfToken;
     try {
@@ -82,13 +84,36 @@ function normalizeError(error) {
     return Promise.reject(normalizedError);
 }
 
+// If we get a CSRF failure, refresh token and retry once
+async function handleCsrfAndRetry(error) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.error?.message || error?.response?.data?.message || '';
+    const config = error?.config || {};
+    const shouldRetry = status === 403 && /invalid csrf token/i.test(message) && !config._retriedCsrf;
+    if (!shouldRetry) return Promise.reject(error);
+    try {
+        csrfToken = null; // force refresh
+        const token = await ensureCsrfToken();
+        config._retriedCsrf = true;
+        config.headers = config.headers || {};
+        if (token) config.headers['X-CSRF-Token'] = token;
+        config.withCredentials = true;
+        return api(config);
+    } catch (e) {
+        return Promise.reject(error);
+    }
+}
+
 api.interceptors.response.use(
     normalizeSuccessResponse,
-    normalizeError
+    async (error) => handleCsrfAndRetry(error).catch(normalizeError)
 );
 
 // Also attach to default axios so existing imports benefit
-axios.interceptors.response.use(normalizeSuccessResponse, normalizeError);
+axios.interceptors.response.use(
+    normalizeSuccessResponse,
+    async (error) => handleCsrfAndRetry(error).catch(normalizeError)
+);
 
 export async function safeFetch(input, init = {}) {
     try {
