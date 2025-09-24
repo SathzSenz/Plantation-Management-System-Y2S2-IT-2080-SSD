@@ -328,7 +328,7 @@ export default function PastSalaryList() {
                             <td className="px-6 py-4">{record.description}</td>
 
 
-                            { getPermission("update:records").isGranted ? (
+                            
                                 <td className=" ">
 
                                     <Button shape="circle" type="text" onClick={() => {
@@ -340,8 +340,7 @@ export default function PastSalaryList() {
                                         />
                                     </Button>
                                 </td>
-                            ) : null
-                            }
+                           
                         </tr>
                     ))}
                     </tbody>

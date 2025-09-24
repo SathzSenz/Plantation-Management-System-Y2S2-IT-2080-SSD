@@ -161,8 +161,7 @@ export default function HarvestList() {
                             <td className="py-4 text-right">
 
                             </td>
-                            {
-                                getPermission("update:records").isGranted ? (
+                           
                             <td className="py-4 text-right">
                                 <a href={`/harvest/records/updateRecord/${record._id}`}
                                    className="font-medium text-blue-600 hover:underline">
@@ -171,10 +170,8 @@ export default function HarvestList() {
                                         aria-hidden="true"/>
                                 </a>
                             </td>
-                                ): null
-                            }
-                            {
-                                getPermission("update:records").isGranted ? (
+                               
+                           
                             <td className="py-4 text-right">
                                 <button className="flex items-center" onClick={() => handleDeleteHarvest(record._id)}>
                                     <TrashIcon
@@ -182,8 +179,7 @@ export default function HarvestList() {
                                         aria-hidden="true"/>
                                 </button>
                             </td>
-                                    ): null
-                            }
+                                    
                         </tr>
                     ))}
                     </tbody>

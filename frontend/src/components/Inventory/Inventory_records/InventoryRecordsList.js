@@ -293,8 +293,8 @@ const InventoryRecordList = () => {
                                             aria-hidden="true"/>
                                     </Link>
                                 </td>
-                                {
-                                    getPermission("update:records").isGranted ? (
+                                
+                                  
                                         <td className="py-4 text-right">
                                             <Link
                                                 to={`/inventory/inventoryrecords/editinventorypage/${record._id}`}
@@ -305,10 +305,8 @@ const InventoryRecordList = () => {
                                                     aria-hidden="true"/>
                                             </Link>
                                         </td>
-                                    ): null
-                                }
-                                {
-                                    getPermission("update:records").isGranted ? (
+                                    
+                               
                                         <td className="">
                                             <button
                                                 className="flex items-center"
@@ -319,8 +317,7 @@ const InventoryRecordList = () => {
                                                     aria-hidden="true"/>
                                             </button>
                                         </td>
-                                    ): null
-                                }
+                                    
                             </tr>
                         ))}
                         </tbody>

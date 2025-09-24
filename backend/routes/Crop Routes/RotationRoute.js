@@ -3,11 +3,13 @@ import mongoose from 'mongoose';
 import { Rotation } from '../../models/Crop Models/RotationModel.js';
 import { asyncHandler } from '../../middleware/errorMiddleware.js';
 import { createNotFoundError, createValidationError } from '../../utils/errors.js';
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
 //Save new record
-router.post('/', asyncHandler(async(request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async(request, response) => {
         if (
             !request.body.season||
             !request.body.fieldName||
@@ -34,13 +36,13 @@ router.post('/', asyncHandler(async(request, response) => {
 }));
 
 //Get all records
-router.get('/', asyncHandler(async(request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async(request, response) => {
         const result = await Rotation.find({});
         return response.success({ count: result.length, data: result })
 }));
 
 //Get one record by id
-router.get('/:id', asyncHandler(async(request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async(request, response) => {
         const {id} = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -52,7 +54,7 @@ router.get('/:id', asyncHandler(async(request, response) => {
 }));
 
 //Update record
-router.put('/:id', asyncHandler(async(request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async(request, response) => {
         if (
             !request.body.season||
             !request.body.fieldName||
@@ -86,7 +88,7 @@ router.put('/:id', asyncHandler(async(request, response) => {
 }));
 
 //Route to delete a Record
-router.delete('/:id', asyncHandler(async(request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async(request, response) => {
         const {id} = request.params
         
         if (!mongoose.Types.ObjectId.isValid(id)) {

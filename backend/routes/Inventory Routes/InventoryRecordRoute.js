@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createNotFoundError, createValidationError } from "../../utils/errors.js";
 import {InventoryInput} from "../../models/Inventory Models/InventoryRecordModel.js";
+import { protect, authorize } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 // Save a new inventory record
-router.post('/', asyncHandler(async (request, response) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const {
             type,
             record_ID,
@@ -59,13 +60,13 @@ router.post('/', asyncHandler(async (request, response) => {
 
 
 // Get all inventory records
-router.get('/', asyncHandler(async (request, response) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (request, response) => {
         const inventoryinputs = await InventoryInput.find({});
         return response.success({ count: inventoryinputs.length, data: inventoryinputs });
 }));
 
 // Get inventory record by ID
-router.get('/:id', asyncHandler(async (request, response) => {
+router.get('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
 
         // Ensure id is not undefined
@@ -85,7 +86,7 @@ router.get('/:id', asyncHandler(async (request, response) => {
 }));
 
 // Update inventory record
-router.put('/:id', asyncHandler(async (request, response) => {
+router.put('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -149,7 +150,7 @@ router.put('/:id', asyncHandler(async (request, response) => {
 
 
 // Delete inventory record
-router.delete('/:id', asyncHandler(async (request, response) => {
+router.delete('/:id',protect, authorize('user'), asyncHandler(async (request, response) => {
         const { id } = request.params;
         
         if (!mongoose.Types.ObjectId.isValid(id)) {

@@ -280,7 +280,7 @@ export default function DiseaseList() {
                             </Link>
                         </td>
                         {
-                            getPermission("update:records").isGranted? (
+                            
                                 <td className=" py-4 text-right">
                                     <Link to={`/diseases/records/updateDisease/${drecord._id}`}>
                                         <PencilSquareIcon
@@ -288,10 +288,10 @@ export default function DiseaseList() {
                                             aria-hidden="true"/>
                                     </Link>
                                 </td>
-                            ):null
+                            
                         }
                         {
-                            getPermission("update:records").isGranted? (
+                            
                                 <td className=" ">
                                     <button
                                         className="flex items-center"
@@ -302,7 +302,7 @@ export default function DiseaseList() {
                                             aria-hidden="true"/>
                                     </button>
                                 </td>
-                            ):null
+                            
                         }
                     </tr>
                 ))}

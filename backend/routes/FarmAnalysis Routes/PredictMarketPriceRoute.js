@@ -6,10 +6,12 @@ import * as tf from '@tensorflow/tfjs';
 import {predictFuturePricesTF1} from "./predictionUtil.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createValidationError, createNotFoundError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/',protect, authorize('user'), asyncHandler(async (req, res) => {
 
         const {name} = req.query;  //retrieves name as parameter
 

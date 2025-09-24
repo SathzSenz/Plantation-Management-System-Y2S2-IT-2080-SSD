@@ -2,10 +2,12 @@ import express from "express";
 import {InventoryInput} from "../../models/Inventory Models/InventoryRecordModel.js";
 import { asyncHandler } from "../../middleware/errorMiddleware.js";
 import { createValidationError } from "../../utils/errors.js";
+import { protect, authorize } from "../../middleware/auth.js";
+
 
 const router = express.Router();
 
-router.post('/', asyncHandler(async (req, res) => {
+router.post('/',protect, authorize('user'), asyncHandler(async (req, res) => {
         const { treatment } = req.body;
 
         // Find all records with the specified treatment name
@@ -25,7 +27,7 @@ router.post('/', asyncHandler(async (req, res) => {
         }
 }));
 
-router.post('/recommendTreatment', (req, res) => {
+router.post('/recommendTreatment',protect, authorize('user'), (req, res) => {
 
     const {disease_name} = req.body;
 

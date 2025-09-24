@@ -1,5 +1,9 @@
 // backend/index.js
 import express from "express";
+import helmet from "helmet";
+import passport from "passport";
+import dotenv from "dotenv";
+import sesssion from "express-session";
 import { PORT, mongoDBURL } from "./config.js";
 import mongoose from "mongoose";
 import { TestRecord } from "./models/TestModel.js";
@@ -8,6 +12,9 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import testRoute from "./routes/TestRoute.js";
+import AuthRoute from "./routes/AuthRoute.js";
+import setupGooglePassport from "./auth/passportGoogle.js";
+import { protect } from "./middleware/auth.js";
 
 import BookingRoute from "./routes/AgroTourism Routes/BookingRoute.js";
 import FeedbackRoute from "./routes/AgroTourism Routes/FeedbackRoute.js";
@@ -42,11 +49,21 @@ import TreatmentSelectionRoute from "./routes/Disease Tracking Routes/TreatmentS
 import PredictMarketPriceRoute from "./routes/FarmAnalysis Routes/PredictMarketPriceRoute.js";
 import MachineRecordRoute from "./routes/Finance Routes/MachineRecordRoute.js";
 
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(helmet());
+app.use(helmet.noSniff());
+
+setupGooglePassport();
+app.use(passport.initialize());
+
+
+
 
 //app.use(cors());
 
@@ -100,11 +117,16 @@ app.use(requestIdMiddleware);
 app.use(attachResponseHelpers);
 
 // CSRF protection (cookie-based secret)
+// Note: For cross-site SPA (frontend on a different domain) the CSRF secret cookie
+// must use SameSite 'none'. Make this configurable via env for dev/prod parity.
+const CSRF_SAMESITE = (process.env.CSRF_COOKIE_SAMESITE || (process.env.NODE_ENV === 'production' ? 'none' : 'lax'));
+const CSRF_SECURE = (process.env.CSRF_COOKIE_SECURE ? process.env.CSRF_COOKIE_SECURE === 'true' : process.env.NODE_ENV === 'production');
+
 const csrfProtection = csurf({
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: CSRF_SECURE,
+        sameSite: CSRF_SAMESITE,
     },
 });
 
@@ -113,11 +135,11 @@ app.use(csrfProtection);
 
 // CSRF token endpoint for SPA to fetch token
 app.get('/csrf-token', (req, res) => {
-    // Optionally also mirror token in a readable cookie for non-AJAX forms
+    // Mirror token in a readable cookie to support traditional forms if needed
     res.cookie('XSRF-TOKEN', req.csrfToken(), {
         httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: CSRF_SECURE,
+        sameSite: CSRF_SAMESITE,
     });
     return res.status(200).json({ success: true, data: { csrfToken: req.csrfToken() }, requestId: req.requestId });
 });
@@ -128,7 +150,7 @@ app.get('/', (request, response) => {
     return response.status(234).send('welcome to Elemahana');
 });
 
-
+app.use('/auth', AuthRoute);
 
 app.use('/financeincome', testRoute);
 app.use('/transactions', transactionsLimiter, TransactionsRoute);
