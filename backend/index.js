@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from "helmet";
 import passport from "passport";
 import dotenv from "dotenv";
 import sesssion from "express-session";
@@ -53,6 +54,9 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(helmet());
+app.use(helmet.noSniff());
 
 setupGooglePassport();
 app.use(passport.initialize());

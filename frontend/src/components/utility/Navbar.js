@@ -15,6 +15,7 @@ export default function Navbar() {
             if (res.ok) {
                 const data = await res.json();
                 setUser(data.user);
+                console.log(data.user);
             } else {
                 setUser(null);
             }
@@ -27,8 +28,17 @@ export default function Navbar() {
     };
 
     useEffect(() => {
-    fetchUser(); // always fetch user on mount
+  const init = async () => {
+    await fetchUser();
+    if (window.location.search.includes('logged_in=true')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('logged_in');
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  };
+  init();
 }, []);
+
 
 
     const handleGoogleLogin = () => {

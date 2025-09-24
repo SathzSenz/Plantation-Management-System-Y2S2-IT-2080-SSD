@@ -4,14 +4,15 @@ import bcrypt from 'bcrypt';
 import { User } from '../models/User Models/UserModel.js';
 import { signToken } from '../middleware/auth.js';
 import passport from 'passport';
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const JWT_COOKIE_NAME = process.env.JWT_COOKIE_NAME || 'elema_jwt';
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // keep false in dev
+  secure: false, // keep false in dev
   sameSite: 'lax', // Lax for localhost redirects
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
+  maxAge:  60 * 60 * 1000, // 1 day
 };
 
 // Register (local)
@@ -55,7 +56,9 @@ router.post('/login', async (req, res, next) => {
 // Logout
 router.post('/logout', (req, res) => {
   res.clearCookie(JWT_COOKIE_NAME);
-  res.json({ success: true });
+ req.logout(() => {
+    res.status(200).json({ message: "Logged out" });
+  });
 });
 
 // --- Google OAuth endpoints using passport (see passport setup) ---
@@ -80,14 +83,26 @@ router.get('/google/failure', (req, res) => {
 
 router.get('/me', async (req, res) => {
     const token = req.cookies[JWT_COOKIE_NAME];
-    if (!token) return res.status(401).json({ user: null });
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select('-passwordHash');
-        res.json({ user });
-    } catch {
-        res.status(401).json({ user: null });
+    console.log(token);
+    console.log("Hello");
+    if (token) {
+        try {
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  console.log('Decoded:', decoded);
+  const user = await User.findById(decoded.id).select('-passwordHash');
+  console.log('User from DB:', user);
+  res.json({ user });
+} catch (err) {
+  console.error('JWT verify error:', err.message);
+  return res.status(401).json({ user: null });
+}
+
     }
+    if (!token) {
+        console.log("Jeesh");
+        return res.status(401).json({ user: null });
+    } 
+    
 });
 
 export default router;
